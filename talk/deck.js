@@ -261,7 +261,7 @@ function bullets(s, items, opts = {}) {
     ['03', 'The catch', 'Nx 23 gates the wrapper task behind Nx Cloud'],
     ['04', 'Parallel, no cloud', 'Two small scripts get the split back'],
     ['05', 'The cache', 'Why a re-run only executes the failures'],
-    ['06', 'Distribution', 'A GitHub matrix instead of a subscription'],
+    ['06', 'Scale', 'Three apps, 30 targets, one runner each'],
   ];
 
   rows.forEach(([n, head, sub], i) => {
@@ -305,7 +305,7 @@ function bullets(s, items, opts = {}) {
       color: C.muted,
     });
   });
-  notes(s, 'Sections 03 and 05 are the new material versus the last time I gave this talk.');
+  notes(s, 'Sections 03, 05 and 06 are the new material versus the last time I gave this talk. Six rows, six sections — the scale section is where the monorepo argument lives.');
 }
 
 /* ── 03 the problem ───────────────────────────────────────────────── */
@@ -1113,38 +1113,227 @@ function bullets(s, items, opts = {}) {
   notes(s, 'If you want the "everything re-runs" version instead, run nx reset before this step.');
 }
 
-/* ── 13 distribution ──────────────────────────────────────────────── */
+/* ── 13 scale: the workspace ──────────────────────────────────────── */
+{
+  const s = darkSlide();
+  kicker(s, 'Section 06 · Scale');
+  title(s, 'Now do it for a whole monorepo');
+
+  const apps = [
+    { name: 'shop', desc: 'storefront', deps: 'formatting', color: C.accent },
+    { name: 'admin', desc: 'back-office', deps: 'ui + formatting', color: C.cool },
+    { name: 'docs', desc: 'documentation', deps: 'ui', color: 'C084FC' },
+  ];
+  apps.forEach((a, i) => {
+    const x = M + i * 4.05;
+    s.addShape(pres.ShapeType.roundRect, {
+      x,
+      y: 2.0,
+      w: 3.75,
+      h: 1.75,
+      rectRadius: 0.08,
+      fill: { color: C.panel },
+      line: { color: a.color, width: 1.5 },
+    });
+    s.addText(a.name, {
+      x: x + 0.25,
+      y: 2.2,
+      w: 3.2,
+      h: 0.4,
+      isTextBox: true,
+      margin: 0,
+      fontFace: F.mono,
+      fontSize: 20,
+      bold: true,
+      color: a.color,
+    });
+    s.addText(a.desc, {
+      x: x + 0.25,
+      y: 2.62,
+      w: 3.2,
+      h: 0.3,
+      isTextBox: true,
+      margin: 0,
+      fontFace: F.body,
+      fontSize: 13,
+      color: C.body,
+    });
+    s.addText('10 specs → 10 targets', {
+      x: x + 0.25,
+      y: 2.94,
+      w: 3.2,
+      h: 0.3,
+      isTextBox: true,
+      margin: 0,
+      fontFace: F.body,
+      fontSize: 12,
+      color: C.muted,
+    });
+    s.addText(`uses ${a.deps}`, {
+      x: x + 0.25,
+      y: 3.24,
+      w: 3.2,
+      h: 0.3,
+      isTextBox: true,
+      margin: 0,
+      fontFace: F.mono,
+      fontSize: 11,
+      color: C.muted,
+    });
+  });
+
+  statCard(s, { x: M, y: 4.15, w: 3.75, value: '30', label: 'atomized targets', color: C.accent });
+  statCard(s, { x: M + 4.05, y: 4.15, w: 3.75, value: '202', label: 'tests across three apps', color: C.text });
+  statCard(s, { x: M + 8.1, y: 4.15, w: 3.75, value: '2', label: 'shared libs, on purpose', color: C.cool });
+
+  s.addText(
+    'The libs are shared unevenly — that is the point. No single change invalidates all three apps.',
+    {
+      x: M,
+      y: 6.0,
+      w: W - 2 * M,
+      h: 0.4,
+      isTextBox: true,
+      margin: 0,
+      fontFace: F.body,
+      fontSize: 14,
+      italic: true,
+      color: C.muted,
+    }
+  );
+  notes(
+    s,
+    'Everything up to here was one app. This is where it becomes a monorepo talk. 202 tests is the honest count: 56 shop, 78 admin, 68 docs. The uneven lib sharing is deliberate set-up for the affected slide two along.'
+  );
+}
+
+/* ── 14 the ladder ────────────────────────────────────────────────── */
+{
+  const s = lightSlide();
+  kicker(s, 'Section 06 · The numbers', '0B7A44');
+  title(s, 'Climb only as far as you need', '10131A');
+
+  const bars = [
+    { rung: '1', label: 'Un-atomized, one process per app', v: 260, color: 'F5A524' },
+    { rung: '2', label: 'Atomized, but still serial', v: 342, color: 'C2410C' },
+    { rung: '3', label: 'Atomized, 5 at a time, one machine', v: 152, color: '0B7A44' },
+    { rung: '4', label: 'One runner per app, 5 at a time each', v: 55, color: '0B7A44' },
+    { rung: '—', label: 'Re-run, nothing changed', v: 5, color: '15803D' },
+  ];
+  const maxW = 6.9;
+  bars.forEach((b, i) => {
+    const y = 2.1 + i * 0.82;
+    s.addText(b.rung, {
+      x: M,
+      y,
+      w: 0.4,
+      h: 0.4,
+      isTextBox: true,
+      margin: 0,
+      valign: 'middle',
+      fontFace: F.mono,
+      fontSize: 15,
+      bold: true,
+      color: '8A94A6',
+    });
+    s.addText(b.label, {
+      x: M + 0.45,
+      y,
+      w: 4.0,
+      h: 0.4,
+      isTextBox: true,
+      margin: 0,
+      valign: 'middle',
+      fontFace: F.body,
+      fontSize: 13,
+      color: '10131A',
+    });
+    s.addShape(pres.ShapeType.roundRect, {
+      x: M + 4.5,
+      y: y + 0.07,
+      w: Math.max(0.08, (b.v / 342) * maxW),
+      h: 0.32,
+      rectRadius: 0.04,
+      fill: { color: b.color },
+      line: { color: b.color, width: 0 },
+    });
+    const mins = Math.floor(b.v / 60);
+    s.addText(`${mins ? `${mins}m ` : ''}${b.v % 60}s`, {
+      x: M + 4.6 + Math.max(0.08, (b.v / 342) * maxW),
+      y,
+      w: 1.5,
+      h: 0.4,
+      isTextBox: true,
+      margin: 0,
+      valign: 'middle',
+      fontFace: F.body,
+      fontSize: 14,
+      bold: true,
+      color: '10131A',
+    });
+  });
+
+  s.addShape(pres.ShapeType.roundRect, {
+    x: M,
+    y: 6.3,
+    w: W - 2 * M,
+    h: 0.75,
+    rectRadius: 0.07,
+    fill: { color: 'FFF7E6' },
+    line: { color: 'F5A524', width: 1 },
+  });
+  s.addText(
+    'Rung 2 is still the honest one: at 30 specs, atomizing without parallelism is 31% slower than not atomizing at all.',
+    {
+      x: M + 0.3,
+      y: 6.47,
+      w: W - 2 * M - 0.6,
+      h: 0.45,
+      isTextBox: true,
+      margin: 0,
+      fontFace: F.body,
+      fontSize: 14,
+      color: '5B4308',
+    }
+  );
+  notes(
+    s,
+    'The headline is 4m20s to 55s, but do not skip rung 2. Rung 3 is one flag and gets most of the win; rung 4 needs CI to have a matrix. Tell them to climb only as far as their pain justifies. Re-measure with npm run e2e:benchmark before the talk — rung 3 varied between 2m11s and 2m32s on repeats.'
+  );
+}
+
+/* ── 15 one runner per app ────────────────────────────────────────── */
 {
   const s = darkSlide();
   kicker(s, 'Section 06 · Distribution');
-  title(s, 'A matrix instead of a subscription');
+  title(s, 'One runner per app, not per shard');
 
   code(
     s,
     [
+      { text: '- id: list', color: '7DD3FC' },
+      { text: '  run: echo "projects=$(node tools/e2e-targets.mjs --projects-json)"', color: C.accent },
+      { text: '', color: C.text },
       { text: 'strategy:', color: '7DD3FC' },
-      { text: '  matrix: { shard: [1, 2, 3] }', color: C.text },
-      { text: 'steps:', color: '7DD3FC' },
-      { text: '  - uses: actions/cache@v4          # path: .nx  (all of it)', color: C.muted },
-      { text: '  - run: node tools/shard-e2e.mjs --shard=${{ matrix.shard }}/3', color: C.accent },
+      { text: '  matrix: { project: "${{ fromJson(needs.discover.outputs.projects) }}" }', color: C.text },
     ],
-    { y: 1.95, w: 7.9, fontSize: 12 }
+    { y: 1.95, w: 7.9, fontSize: 11 }
   );
 
   bullets(
     s,
     [
-      { text: 'Discovery is the same; only the slice differs', color: C.body },
-      { text: 'Round-robin, not contiguous blocks — adjacent specs cost alike', color: C.body },
-      { text: 'Cache all of .nx per shard, so a re-run of a red job is cheap', color: C.body },
-      { text: 'Measured here: 1m 32s cold → 38s with the cache restored', color: C.accent, bold: true },
+      { text: 'The matrix comes from the graph — a 4th app adds a runner by itself', color: C.body },
+      { text: 'One preview server per runner, nothing to balance', color: C.body },
+      { text: 'Costs ~40s up front: discovery needs npm ci before anything starts', color: C.warn },
+      { text: 'Measured: 3m 44s on one machine → 1m 53s across three', color: C.accent, bold: true },
     ],
-    { x: 8.8, y: 1.95, w: 3.8, fontSize: 13, h: 2.4 }
+    { x: 8.8, y: 1.95, w: 3.8, fontSize: 12, h: 2.6 }
   );
 
-  s.addText('What Nx Cloud still buys you', {
+  s.addText('Why not shard by index?', {
     x: M,
-    y: 4.3,
+    y: 4.35,
     w: 11.9,
     h: 0.4,
     isTextBox: true,
@@ -1154,25 +1343,25 @@ function bullets(s, items, opts = {}) {
     bold: true,
     color: C.warn,
   });
-  const paid = [
-    ['Dynamic distribution', 'Splits by measured duration, not by count, and rebalances itself.'],
-    ['A shared remote cache', 'Your hit helps your teammates and CI. Here the cache is per-machine.'],
-    ['Flaky detection', 'Across the org, with automatic re-runs.'],
+  const why = [
+    ['Three servers, not one', 'A shard spanning apps makes Nx build and boot every app on that runner.'],
+    ['Nothing to rebalance', 'Similar-sized apps are already even. Slicing them evenly again buys nothing.'],
+    ['run-many is a cross product', 'shop and admin both have login.cy.ts. A cross-app shard runs the wrong one.'],
   ];
-  paid.forEach(([h, b], i) => {
+  why.forEach(([h, b], i) => {
     const x = M + i * 4.05;
     s.addShape(pres.ShapeType.roundRect, {
       x,
-      y: 4.8,
+      y: 4.85,
       w: 3.75,
-      h: 1.5,
+      h: 1.55,
       rectRadius: 0.07,
       fill: { color: C.panel },
       line: { color: C.line, width: 1 },
     });
     s.addText(h, {
       x: x + 0.22,
-      y: 4.98,
+      y: 5.03,
       w: 3.3,
       h: 0.35,
       isTextBox: true,
@@ -1184,9 +1373,9 @@ function bullets(s, items, opts = {}) {
     });
     s.addText(b, {
       x: x + 0.22,
-      y: 5.36,
+      y: 5.41,
       w: 3.3,
-      h: 0.85,
+      h: 0.9,
       isTextBox: true,
       margin: 0,
       valign: 'top',
@@ -1195,10 +1384,123 @@ function bullets(s, items, opts = {}) {
       color: C.muted,
     });
   });
-  notes(s, 'Do not oversell. The argument is that the free tier of this idea is unclaimed, not that the paid product is pointless. The 1m32s to 38s figure is from this repo\'s own Actions runs, same commit run twice; the e2e step itself drops to 31ms and what remains is checkout plus npm ci.');
+  notes(
+    s,
+    'Sharding by index is the answer people expect, so say why it is the wrong default here and keep it for the case it is good at: one app big enough to dominate. The cross-product point is real — this repo has two login.cy.ts files and the runner refuses the selection rather than quietly running both.'
+  );
 }
 
-/* ── 14 gotchas ───────────────────────────────────────────────────── */
+/* ── 16 affected ──────────────────────────────────────────────────── */
+{
+  const s = lightSlide();
+  kicker(s, 'Section 06 · The graph earns its keep', '0B7A44');
+  title(s, 'Let the graph pick the work', '10131A');
+
+  const rows = [
+    ['libs/formatting', 'shop + admin', '20 targets', 'F5A524'],
+    ['libs/ui', 'admin + docs', '20 targets', 'F5A524'],
+    ['apps/docs/**', 'docs', '10 targets', '0B7A44'],
+    ['a README typo', 'nothing at all', '0 targets', '15803D'],
+  ];
+  s.addText('You touch', {
+    x: M,
+    y: 2.15,
+    w: 3.6,
+    h: 0.3,
+    isTextBox: true,
+    margin: 0,
+    fontFace: F.body,
+    fontSize: 12,
+    bold: true,
+    charSpacing: 1.5,
+    color: '8A94A6',
+  });
+  s.addText('Nx runs', {
+    x: M + 4.2,
+    y: 2.15,
+    w: 3.6,
+    h: 0.3,
+    isTextBox: true,
+    margin: 0,
+    fontFace: F.body,
+    fontSize: 12,
+    bold: true,
+    charSpacing: 1.5,
+    color: '8A94A6',
+  });
+  rows.forEach(([touch, runs, count, color], i) => {
+    const y = 2.6 + i * 0.78;
+    s.addText(touch, {
+      x: M,
+      y,
+      w: 4.0,
+      h: 0.45,
+      isTextBox: true,
+      margin: 0,
+      valign: 'middle',
+      fontFace: F.mono,
+      fontSize: 15,
+      color: '10131A',
+    });
+    s.addText(runs, {
+      x: M + 4.2,
+      y,
+      w: 4.0,
+      h: 0.45,
+      isTextBox: true,
+      margin: 0,
+      valign: 'middle',
+      fontFace: F.body,
+      fontSize: 15,
+      color: '10131A',
+    });
+    s.addShape(pres.ShapeType.roundRect, {
+      x: M + 8.6,
+      y: y + 0.04,
+      w: 1.9,
+      h: 0.38,
+      rectRadius: 0.19,
+      fill: { color: color === '15803D' ? 'DCF5E7' : color === '0B7A44' ? 'DCF5E7' : 'FDF0D5' },
+      line: { width: 0 },
+    });
+    s.addText(count, {
+      x: M + 8.6,
+      y: y + 0.04,
+      w: 1.9,
+      h: 0.38,
+      isTextBox: true,
+      margin: 0,
+      align: 'center',
+      valign: 'middle',
+      fontFace: F.body,
+      fontSize: 12,
+      bold: true,
+      color: color === 'F5A524' ? '7A5200' : '14603C',
+    });
+  });
+
+  s.addText(
+    'This is the argument for keeping e2e in the monorepo: the graph already knows which apps a shared component can break.',
+    {
+      x: M,
+      y: 6.05,
+      w: W - 2 * M,
+      h: 0.5,
+      isTextBox: true,
+      margin: 0,
+      fontFace: F.body,
+      fontSize: 15,
+      italic: true,
+      color: '5C6675',
+    }
+  );
+  notes(
+    s,
+    'Run this live: npm run e2e:affected on a clean tree exits green instantly, then touch libs/ui and watch two apps light up. The last row is the one that lands — most CI runs on most days are documentation and config.'
+  );
+}
+
+/* ── 17 gotchas ───────────────────────────────────────────────────── */
 {
   const s = lightSlide();
   kicker(s, 'Before you try this at work', 'B45309');
@@ -1258,20 +1560,21 @@ function bullets(s, items, opts = {}) {
   notes(s, 'Good slide to leave up during questions. Items 3 and 4 both bit this repo on its first CI run — worth telling as war stories rather than reading out.');
 }
 
-/* ── 15 takeaways ─────────────────────────────────────────────────── */
+/* ── 18 takeaways ─────────────────────────────────────────────────── */
 {
   const s = darkSlide();
   kicker(s, 'Takeaways');
-  title(s, 'Four things to take back');
+  title(s, 'Five things to take back');
 
   const points = [
     ['Splitting is generated, not maintained', 'One target per spec file, from one plugin entry in nx.json.'],
     ['Splitting alone is not a speedup', 'It is the precondition for one. Concurrency has to beat the startup tax.'],
     ['The cache is the retry story', 'Failed tasks are never cached, so a retry runs only the failures.'],
+    ['Distribute by app before by index', 'One server per runner, nothing to balance, and no cross-product traps.'],
     ['None of this needs Nx Cloud', 'The gate is on one convenience target. Discovery plus run-many gets around it.'],
   ];
   points.forEach(([h, b], i) => {
-    const y = 2.0 + i * 1.15;
+    const y = 1.95 + i * 1.02;
     s.addText(`0${i + 1}`, {
       x: M,
       y,
@@ -1308,10 +1611,10 @@ function bullets(s, items, opts = {}) {
       color: C.muted,
     });
   });
-  notes(s, 'Land on number four. Most teams pay the slow-suite tax without ever having tried the free half of this.');
+  notes(s, 'Land on number five. Most teams pay the slow-suite tax without ever having tried the free half of this.');
 }
 
-/* ── 16 q&a ───────────────────────────────────────────────────────── */
+/* ── 19 q&a ───────────────────────────────────────────────────────── */
 {
   const s = darkSlide();
   s.addText('Questions', {
