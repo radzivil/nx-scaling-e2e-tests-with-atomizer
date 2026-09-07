@@ -24,7 +24,7 @@ const run = (cmd, cmdArgs) => {
 
 const reset = () => execFileSync('npx', ['nx', 'reset'], { stdio: 'ignore' });
 
-const discovered = projectsWithAtomizedTargets();
+const discovered = await projectsWithAtomizedTargets();
 const targetCount = discovered.reduce((n, d) => n + d.targets.length, 0);
 const e2eProjects = discovered.map((d) => d.project);
 

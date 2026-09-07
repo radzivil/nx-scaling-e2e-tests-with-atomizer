@@ -32,7 +32,7 @@ const parallel = arg('parallel', '1');
 const affected = args.includes('--affected');
 const only = arg('project')?.split(',').filter(Boolean) ?? null;
 
-const discovered = projectsWithAtomizedTargets({ affected });
+const discovered = await projectsWithAtomizedTargets({ affected });
 
 if (discovered.length === 0) {
   if (affected) {

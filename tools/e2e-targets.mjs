@@ -8,22 +8,42 @@
  */
 import { execFileSync } from 'node:child_process';
 
+import { createProjectGraphAsync } from '@nx/devkit';
+
 export const CI_TARGET_PREFIX = 'e2e-ci--';
 
-const nx = (...args) => execFileSync('npx', ['nx', ...args], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
+/**
+ * Read the graph in-process rather than shelling out to `nx show project` once
+ * per project. Each `npx nx` costs a couple of seconds of startup, so the
+ * subprocess version put ~14s of tooling in front of a 0.2s cache replay — the
+ * discovery, not the tests, was the floor.
+ */
+export async function projectsWithAtomizedTargets({ affected = false } = {}) {
+  const graph = await createProjectGraphAsync({ exitOnError: true });
 
-export function projectsWithAtomizedTargets({ affected = false } = {}) {
-  const projects = JSON.parse(nx('show', 'projects', ...(affected ? ['--affected'] : []), '--json'));
+  // No public API for the affected set, so this one case still shells out —
+  // once, not once per project.
+  const limitTo = affected
+    ? new Set(
+        JSON.parse(
+          execFileSync('npx', ['nx', 'show', 'projects', '--affected', '--json'], {
+            encoding: 'utf8',
+            maxBuffer: 32 * 1024 * 1024,
+          })
+        )
+      )
+    : null;
 
-  return projects
-    .map((project) => {
-      const { targets = {} } = JSON.parse(nx('show', 'project', project, '--json'));
-      return {
-        project,
-        targets: Object.keys(targets).filter((t) => t.startsWith(CI_TARGET_PREFIX)).sort(),
-      };
-    })
-    .filter(({ targets }) => targets.length > 0);
+  return Object.entries(graph.nodes)
+    .filter(([project]) => !limitTo || limitTo.has(project))
+    .map(([project, node]) => ({
+      project,
+      targets: Object.keys(node.data.targets ?? {})
+        .filter((t) => t.startsWith(CI_TARGET_PREFIX))
+        .sort(),
+    }))
+    .filter(({ targets }) => targets.length > 0)
+    .sort((a, b) => a.project.localeCompare(b.project));
 }
 
 /**
@@ -45,7 +65,7 @@ export function parseShard(value) {
   return { index, total };
 }
 
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   const shardArg = args.find((a) => a.startsWith('--shard='))?.split('=')[1];
   const shard = shardArg ? parseShard(shardArg) : null;
@@ -54,11 +74,11 @@ function main() {
   // Used by CI to build its matrix from the graph, so adding an app to the
   // workspace adds a runner without anyone editing the workflow.
   if (args.includes('--projects-json')) {
-    console.log(JSON.stringify(projectsWithAtomizedTargets({ affected }).map(({ project }) => project)));
+    console.log(JSON.stringify((await projectsWithAtomizedTargets({ affected })).map(({ project }) => project)));
     return;
   }
 
-  const discovered = projectsWithAtomizedTargets({ affected }).map(({ project, targets }) => ({
+  const discovered = (await projectsWithAtomizedTargets({ affected })).map(({ project, targets }) => ({
     project,
     targets: shard ? shardOf(targets, shard.index, shard.total) : targets,
   }));
