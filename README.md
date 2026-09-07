@@ -1,32 +1,47 @@
 # Scaling E2E Tests the Smart Way with Nx
 
-Live-demo companion for the talk. A small Nx monorepo with a React shop and a
-Cypress suite, set up so you can watch the Nx **atomizer** split one slow e2e
-task into one task per spec file — and then watch the cache turn a re-run into
-almost nothing.
+Live-demo companion for the talk. An Nx monorepo with **three React apps**, two
+shared libs and **30 Cypress spec files**, set up so you can watch the Nx
+**atomizer** split each app's slow e2e task into one task per spec file — and
+then watch the cache turn a re-run into almost nothing.
 
 Everything here runs **without Nx Cloud**.
 
-## The numbers on this repo
+| App | What it is | Specs | Depends on |
+| --- | --- | --- | --- |
+| `shop` | storefront: catalog, cart, checkout | 10 | `formatting` |
+| `admin` | back-office: products, orders, users | 10 | `ui`, `formatting` |
+| `docs` | documentation site: articles, search | 10 | `ui` |
 
-Ten spec files, 56 tests, measured on an M-series laptop:
+The dependencies are deliberately asymmetric. That is what makes `nx affected`
+worth showing: no single change invalidates everything.
 
-| Run | Command | Wall clock |
+## The ladder
+
+Four ways to run the same 30 spec files, measured on an M-series laptop:
+
+| Rung | How | Wall clock |
 | --- | --- | --- |
-| One task, all specs | `nx e2e shop-e2e` | **~1m 33s** |
-| Atomized, one at a time | `node tools/run-e2e.mjs --parallel=1` | **~1m 55s** |
-| Atomized, 5 at a time | `node tools/run-e2e.mjs --parallel=5` | **~40s** |
-| Re-run, nothing changed | same command again | **~0.15s** |
-| Re-run after 2 specs fail | same command again | only the 2 failures execute |
+| 1 | Un-atomized — `nx e2e` per app, one process each | **~4m 20s** |
+| 2 | Atomized but serial — `--parallel=1` | **~5m 40s** ← *slower* |
+| 3 | Atomized, 5 at a time on one machine | **~2m 20s** |
+| 4 | One runner per app, 5 at a time on each | **~55s** |
+| — | Re-run with nothing changed | **~5s** |
 
-Cold atomized runs measured 39s, 42s and 52s across repeats — e2e timings are
-noisy, so quote a range on stage rather than a single number, and re-measure on
-the machine you will actually present from.
+Climb only as far as you need. Rung 3 is a one-line change and buys the most;
+rung 4 needs CI to have a matrix.
 
-Row 2 is the one people don't expect: splitting the suite and *not* running it
-concurrently makes things **worse**, because every spec now boots its own
-Cypress. Atomization is not a speedup on its own — it is what makes a speedup
-possible. Rows 4 and 5 are the real point of the talk.
+**Rung 2 is the slide people remember.** Splitting the suite and *not* running
+it concurrently is 31% **worse** than not splitting at all, because every spec
+now boots its own Cypress. Atomization is not a speedup — it is what makes a
+speedup possible.
+
+Timings are noisy: repeats of rung 3 measured 2m 11s and 2m 32s. Quote a range
+on stage, and re-measure on the machine you will present from:
+
+```bash
+npm run e2e:benchmark
+```
 
 ## Setup
 
@@ -112,11 +127,13 @@ list yourself and you are back in business — which is exactly what
 
 ### 4 — Parallel, no cloud
 
+Stay on one app for now — the whole workspace comes in step 7:
+
 ```bash
-node tools/run-e2e.mjs --parallel=5
+node tools/run-e2e.mjs --project=shop-e2e --parallel=5
 ```
 
-~1m 33s → ~40s on one laptop, with nothing but a shard script.
+~1m 33s → ~40s on one laptop, with nothing but a discovery script.
 
 The script only does two things: ask Nx which atomized targets exist, then hand
 that list to `nx run-many`. It does **not** hand-roll a process pool. Nx already
@@ -130,7 +147,7 @@ reports green on a red suite.
 Run the exact same command again:
 
 ```bash
-node tools/run-e2e.mjs --parallel=5
+node tools/run-e2e.mjs --project=shop-e2e --parallel=5
 ```
 
 ```
@@ -148,7 +165,7 @@ This is the part worth the ticket price. Seed a real bug:
 
 ```bash
 npm run demo:break
-node tools/run-e2e.mjs --parallel=5
+node tools/run-e2e.mjs --project=shop-e2e --parallel=5
 ```
 
 Two specs fail: `cart-totals` and `checkout-happy-path`. Both assert totals on a
@@ -158,7 +175,7 @@ $10.
 Now run it again **without changing anything**:
 
 ```bash
-node tools/run-e2e.mjs --parallel=5
+node tools/run-e2e.mjs --project=shop-e2e --parallel=5
 ```
 
 ```
@@ -184,7 +201,7 @@ Put it back:
 
 ```bash
 npm run demo:fix
-node tools/run-e2e.mjs --parallel=5
+node tools/run-e2e.mjs --project=shop-e2e --parallel=5
 ```
 
 ```
@@ -198,36 +215,91 @@ restored the exact input hash from before the bug, and Nx still had those result
 on disk. Undoing a change gives you your old results back for free. (On a cold
 cache, `nx reset` first, this step honestly re-runs all ten.)
 
-### 7 — Distribute across machines
+Everything so far has been one app. Now the monorepo part.
+
+### 7 — Distribute across machines: one runner per app
+
+The obvious move in a monorepo is also the right one. Give each app a runner and
+let it run its own specs in parallel:
 
 ```bash
-node tools/run-e2e.mjs --shard=1/3 --parallel=2
-node tools/run-e2e.mjs --shard=2/3 --parallel=2
-node tools/run-e2e.mjs --shard=3/3 --parallel=2
+node tools/run-e2e.mjs --project=shop-e2e  --parallel=5
+node tools/run-e2e.mjs --project=admin-e2e --parallel=5
+node tools/run-e2e.mjs --project=docs-e2e  --parallel=5
 ```
 
-Same discovery, sliced. The shard function deals targets out round-robin rather
-than cutting the sorted list into blocks, because alphabetically adjacent specs
-tend to exercise the same feature at a similar cost — `checkout-happy-path` and
-`checkout-validation` are the two slowest specs here and sit next to each other.
+Run concurrently on CI, the wall clock is the slowest app, not the sum: **~55s**
+against ~2m 20s on one machine.
 
-`.github/workflows/e2e.yml` runs this as a three-way matrix, with the Nx cache
-restored per shard. Re-running a failed CI job then behaves exactly like step 6:
-the passing specs replay from cache and only the failures burn minutes.
+Per-app beats index sharding here for three reasons:
 
-Measured on this repo's own GitHub Actions runs — the same commit, run twice:
+- **One preview server per runner.** A shard that spans apps makes Nx boot and
+  build all three.
+- **Nothing to balance.** The apps are similar sizes, so slicing an already-even
+  distribution buys nothing.
+- **It cannot mis-select.** More on that below.
 
-| Job | Cold | Cache restored |
-| --- | --- | --- |
-| `single-machine` | 2m 7s | **47s** |
-| `sharded (1)` | 1m 32s | **38s** |
-| `sharded (2)` | 1m 42s | **37s** |
-| `sharded (3)` | 1m 6s | **40s** |
+`.github/workflows/e2e.yml` builds the matrix *from the Nx graph*:
 
-The e2e step itself drops to `Run duration: 31ms — Cache: 5/6 hit (83%)`. What
-is left is checkout, `npm ci` and the Cypress binary. Worth saying on stage:
-once the tests are cached, **your CI time is your setup time**, and that is the
-next thing to attack.
+```yaml
+- id: list
+  run: echo "projects=$(node tools/e2e-targets.mjs --projects-json)" >> "$GITHUB_OUTPUT"
+```
+
+Add a fourth app and it gets a runner with no workflow edit. Measured on this
+repo's own Actions runs:
+
+| Job | Time |
+| --- | --- |
+| `discover` | 39s |
+| `admin-e2e` / `shop-e2e` / `docs-e2e` | 1m 51s / 1m 53s / 1m 43s, concurrent |
+| `single-machine`, all 30 | 3m 44s |
+
+Be straight about the trade: `discover` costs ~40s of *serial* latency before
+any runner starts, because it needs `npm ci` to read the graph. End to end that
+is ~2m 32s against 3m 44s. You are buying "adding an app needs no CI change" for
+40 seconds a run. Hardcode the matrix if you would rather have the 40 seconds.
+
+### 8 — Shard one app, but only when you must
+
+Sharding earns its place when a single app is big enough to dominate:
+
+```bash
+node tools/run-e2e.mjs --project=shop-e2e --shard=1/2 --parallel=3
+node tools/run-e2e.mjs --project=shop-e2e --shard=2/2 --parallel=3
+```
+
+Targets are dealt round-robin rather than cut into blocks, because
+alphabetically adjacent specs tend to cost alike — `checkout-happy-path` and
+`checkout-validation` are the two slowest in `shop` and sit next to each other.
+
+**Shard one app at a time.** `nx run-many` takes the *cross product* of
+`--projects` and `--targets`, so a selection is only expressible when each
+target name belongs to exactly one selected project. Both `shop` and `admin`
+have a `login.cy.ts` — a shard wanting only shop's would silently run admin's
+too. `tools/run-e2e.mjs` detects that and refuses:
+
+```
+Cannot express this selection as one nx run-many call.
+  "e2e-ci--src/e2e/login.cy.ts" exists in admin-e2e and shop-e2e, but this
+  slice only wants it from shop-e2e. run-many would run all of them.
+```
+
+### 9 — Let the graph pick the work
+
+```bash
+npm run e2e:affected
+```
+
+| Touch | Nx runs |
+| --- | --- |
+| `libs/formatting` | `admin-e2e`, `shop-e2e` — 20 targets |
+| `libs/ui` | `admin-e2e`, `docs-e2e` — 20 targets |
+| `apps/docs/**` | `docs-e2e` — 10 targets |
+| nothing | exits green immediately |
+
+This is the argument for keeping e2e in the monorepo instead of a separate repo:
+the graph already knows which apps a shared component can break.
 
 ## What Nx Cloud still buys you
 
@@ -246,14 +318,15 @@ teams never turn them on.
 ## Gotchas worth mentioning
 
 - **Atomization is not free per task.** Each atomized target boots its own
-  Cypress process. Ten specs serially through the atomizer is *slower* than the
-  single un-atomized task. The win only shows up once you actually run them
+  Cypress process. All 30 specs serially through the atomizer is *slower* than
+  the three un-atomized tasks — 5m 40s against 4m 20s. The win only shows up once you actually run them
   concurrently — parallelism has to beat the startup tax.
-- **The cache key includes the app.** Touch a shared component and all ten specs
-  invalidate. That is right, but it means the "rerun only failures" trick works
-  between retries of the *same* commit, not across a code change.
-- **`e2e` and `e2e-ci` are different tasks.** `e2e` uses the dev server on
-  :4200; `e2e-ci` builds and uses `vite preview` on :4300. Keep using `e2e`
+- **The cache key includes everything upstream.** Touch `libs/ui` and both
+  `admin` and `docs` invalidate — 20 targets. That is correct, but it means the
+  "rerun only failures" trick works between retries of the *same* commit, not
+  across a code change.
+- **`e2e` and `e2e-ci` are different tasks.** `e2e` uses the dev server;
+  `e2e-ci` builds and uses `vite preview` on a different port. Keep using `e2e`
   locally when you are writing a test.
 - **Cache the Cypress binary in CI too.** Otherwise every shard re-downloads
   ~200 MB and eats the time you just saved.
@@ -284,20 +357,42 @@ teams never turn them on.
   display 99` — *after* its tests passed, which means a green test report and a
   failed task. Start one `Xvfb :99` for the job and export `DISPLAY`. This bit
   this repo on its very first CI run; see `.github/workflows/e2e.yml`.
+- **`nx run-many` is a cross product, not a list.** `--projects=a,b
+  --targets=x,y` runs every combination that exists. Once two apps share a spec
+  filename you can no longer express "shop's login but not admin's" in one call.
+  Select whole apps, or shard one app at a time.
+- **Your own tooling becomes the floor.** Discovery here originally shelled out
+  to `npx nx show project` once per project. At three apps that was four Nx
+  startups — 14s of wall clock in front of a cache replay that Nx reported as
+  `194ms`. Reading the graph in-process with `createProjectGraphAsync` brought
+  it to 3.8s. Once the tests are cached, measure the harness.
+- **A graph-driven CI matrix costs a serial job.** Generating the matrix needs
+  `npm ci` before any runner starts — ~40s here. Worth it to make adding an app
+  free; not worth it if you rarely add apps.
+- **`nx sync` before anything runs.** Adding libs makes Nx demand TypeScript
+  project references, and every task fails with "The workspace is out of sync"
+  until you run it. Commit the result.
 - **`nx reset`** clears the local cache when you want to demo a cold run.
 
 ## Layout
 
 ```
-apps/shop/                       React + Vite shop under test
+apps/shop/                       storefront (:4200 dev, :4300 preview)
   src/app/lib/pricing.ts         the pricing rules the failing specs assert
   src/app/lib/demo-flags.ts      flipped by demo:break / demo:fix
-apps/shop-e2e/src/e2e/           10 spec files → 10 atomized targets
-tools/e2e-targets.mjs            discovers the atomized targets
-tools/run-e2e.mjs              runs them: all, one app, or one shard
+apps/admin/                      back-office  (:4201 dev, :4301 preview)
+apps/docs/                       documentation (:4202 dev, :4302 preview)
+apps/*-e2e/src/e2e/              10 spec files each → 30 atomized targets
+libs/ui/                         shared components — admin + docs
+libs/formatting/                 shared helpers   — shop + admin
+tools/e2e-targets.mjs            reads the atomized targets out of the graph
+tools/run-e2e.mjs                runs them: all, one app, or one shard
+tools/benchmark.mjs              re-measures the ladder
 tools/demo-flag.mjs              seeds and removes the pricing bug
-.github/workflows/e2e.yml        single-machine job + 3-way sharded matrix
+.github/workflows/e2e.yml        graph-driven per-app matrix + baselines
 ```
+
+Each app gets its own ports so three preview servers can run side by side.
 
 ## Scripts
 
@@ -323,4 +418,4 @@ Every one of these goes through `tools/run-e2e.mjs` rather than
 npm run e2e:parallel -- --skip-nx-cache
 ```
 
-Demo login: `demo@nxshop.test` / `nx-atomizer`
+Demo logins: shop `demo@nxshop.test` / `nx-atomizer`, admin `admin@nxshop.test` / `nx-atomizer`
