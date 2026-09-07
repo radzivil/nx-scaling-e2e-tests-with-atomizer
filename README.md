@@ -321,10 +321,14 @@ teams never turn them on.
   Cypress process. All 30 specs serially through the atomizer is *slower* than
   the three un-atomized tasks — 5m 40s against 4m 20s. The win only shows up once you actually run them
   concurrently — parallelism has to beat the startup tax.
-- **The cache key includes everything upstream.** Touch `libs/ui` and both
-  `admin` and `docs` invalidate — 20 targets. That is correct, but it means the
-  "rerun only failures" trick works between retries of the *same* commit, not
-  across a code change.
+- **The cache key includes everything upstream — and nothing else.** Touch
+  `libs/ui` and both `admin` and `docs` invalidate, 20 targets. But the key is
+  computed from *inputs*, not from the commit, so anything outside the graph is
+  free. This repo's own history has the example: a commit that changed only the
+  slide deck restored the previous commit's cache and reported
+  `33/36 hit (92%)`, `Run duration: 119ms`, taking the `single-machine` job from
+  3m 44s to 35s. On a real monorepo most commits touch a fraction of the graph,
+  so most CI runs should be mostly replay.
 - **`e2e` and `e2e-ci` are different tasks.** `e2e` uses the dev server;
   `e2e-ci` builds and uses `vite preview` on a different port. Keep using `e2e`
   locally when you are writing a test.

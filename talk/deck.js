@@ -1097,7 +1097,7 @@ function bullets(s, items, opts = {}) {
     line: { color: '9CC0F5', width: 1 },
   });
   s.addText(
-    'The flip side: touch a shared component and all ten specs invalidate — correctly. Failure-only retries work between retries of the same commit, not across a code change.',
+    'The flip side: touch libs/ui and both admin and docs invalidate — correctly. But the key is built from inputs, not from the commit, so a change outside the graph costs nothing.',
     {
       x: M + 0.3,
       y: 5.75,
@@ -1110,7 +1110,7 @@ function bullets(s, items, opts = {}) {
       color: '1D3F73',
     }
   );
-  notes(s, 'If you want the "everything re-runs" version instead, run nx reset before this step.');
+  notes(s, 'If you want the "everything re-runs" version instead, run nx reset before this step. Best real example from this repo: a commit that touched only the slide deck restored the previous commit\'s cache and reported 33/36 hits and a 119ms run — the single-machine CI job went from 3m44s to 35s without anyone planning it. Inputs, not commits.');
 }
 
 /* ── 13 scale: the workspace ──────────────────────────────────────── */
