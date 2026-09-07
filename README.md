@@ -243,6 +243,17 @@ teams never turn them on.
   locally when you are writing a test.
 - **Cache the Cypress binary in CI too.** Otherwise every shard re-downloads
   ~200 MB and eats the time you just saved.
+- **Nx 23 keeps its cache outside the workspace.** The default is
+  `~/.nx/<hash-of-workspace-path>/cache`, *not* `.nx/cache`. Every CI recipe
+  you will find online caches `.nx/cache`, which on Nx 23 caches an empty
+  directory and silently gives you 0% hits — this repo's first CI run did
+  exactly that. `nx.json` here sets `"cacheDirectory": ".nx/cache"` to pull it
+  back into the workspace where `actions/cache` can see it. Check yours with:
+
+  ```bash
+  node -e "console.log(require('nx/src/utils/cache-directory').cacheDir)"
+  ```
+
 - **On Linux CI, give Cypress one X server.** With `DISPLAY` unset each Cypress
   process starts its own Xvfb on `:99`, so the moment you run two atomized
   targets concurrently the second dies with `Server is already active for

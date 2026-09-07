@@ -56,5 +56,6 @@
   ],
   "analytics": false,
   "defaultBase": "main",
-  "parallel": 5
+  "parallel": 5,
+  "cacheDirectory": ".nx/cache"
 }
