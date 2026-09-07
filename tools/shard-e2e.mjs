@@ -46,7 +46,7 @@ const nxArgs = [
   `--projects=${work.map((w) => w.project).join(',')}`,
   `--targets=${work.flatMap((w) => w.targets).join(',')}`,
   `--parallel=${parallel}`,
-  '--output-style=stream',
+  // '--output-style=stream',
   ...args.filter((a) => !a.startsWith('--shard=') && !a.startsWith('--parallel=')),
 ];
 
