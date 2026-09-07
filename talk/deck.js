@@ -1201,17 +1201,18 @@ function bullets(s, items, opts = {}) {
 {
   const s = lightSlide();
   kicker(s, 'Before you try this at work', 'B45309');
-  title(s, 'Five things that will bite you', '10131A');
+  title(s, 'Six things that will bite you', '10131A');
 
   const items = [
     ['Per-task startup tax', 'Each atomized target boots Cypress. Parallelism has to beat it.'],
     ['e2e-ci is gated on Nx 23', 'The wrapper needs Nx Cloud. The leaf targets do not.'],
-    ['e2e ≠ e2e-ci', 'e2e uses the dev server on :4200, e2e-ci builds and previews on :4300.'],
+    ['The cache is not in .nx/cache', 'Nx 23 puts it in ~/.nx/<hash>/cache. Every CI recipe online caches the wrong path.'],
+    ['Parallel Cypress fights over :99', 'Each process spawns its own Xvfb. Start one and export DISPLAY.'],
     ['Cache the Cypress binary', 'Otherwise every CI shard re-downloads ~200 MB.'],
     ['App changes invalidate everything', 'Correct, but it limits when failure-only retries help.'],
   ];
   items.forEach(([h, b], i) => {
-    const y = 2.1 + i * 0.92;
+    const y = 2.05 + i * 0.85;
     s.addShape(pres.ShapeType.ellipse, { x: M, y: y + 0.06, w: 0.4, h: 0.4, fill: { color: 'B45309' } });
     s.addText(String(i + 1), {
       x: M,
@@ -1253,7 +1254,7 @@ function bullets(s, items, opts = {}) {
       color: '55607A',
     });
   });
-  notes(s, 'Good slide to leave up during questions.');
+  notes(s, 'Good slide to leave up during questions. Items 3 and 4 both bit this repo on its first CI run — worth telling as war stories rather than reading out.');
 }
 
 /* ── 15 takeaways ─────────────────────────────────────────────────── */
