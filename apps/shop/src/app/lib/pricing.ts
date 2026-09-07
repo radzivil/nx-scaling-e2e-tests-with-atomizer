@@ -1,3 +1,5 @@
+import { money } from 'formatting';
+
 import { DEMO_FLAGS } from './demo-flags';
 
 export interface CartLine {
@@ -44,4 +46,4 @@ export function totalsOf(lines: CartLine[]): Totals {
   return { subtotal, discount, shipping, total: round(subtotal - discount + shipping) };
 }
 
-export const money = (n: number) => `$${n.toFixed(2)}`;
+export { money };

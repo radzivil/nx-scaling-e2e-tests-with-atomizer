@@ -1,0 +1,152 @@
+/* Admin-only layout on top of the shared `ui/styles.css` look. */
+
+.nav-spacer {
+  margin-left: auto;
+}
+
+.nav-user {
+  color: var(--ui-muted);
+  font-size: 13px;
+}
+
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.page-head h1 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.narrow {
+  max-width: 560px;
+}
+
+.login-shell {
+  max-width: 420px;
+  margin: 48px auto;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--ui-muted);
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+.loading {
+  color: var(--ui-muted);
+  padding: 24px 0;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.stat {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.toolbar input[type='text'],
+.toolbar input:not([type]),
+.toolbar select {
+  padding: 8px 10px;
+  border: 1px solid var(--ui-line);
+  border-radius: 6px;
+  font: inherit;
+  background: var(--ui-panel);
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ui-muted);
+}
+
+.stock-editor {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stock-editor .ui-btn {
+  padding: 2px 9px;
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.notice {
+  color: var(--ui-accent);
+  font-size: 14px;
+  margin: 10px 0 0;
+}
+
+.error {
+  color: var(--ui-danger);
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 20px;
+  margin: 0 0 12px;
+}
+
+.summary dt {
+  color: var(--ui-muted);
+  font-size: 13px;
+}
+
+.summary dd {
+  margin: 0;
+}
+
+.order-lines,
+.history {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+.ui-field select {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--ui-line);
+  border-radius: 6px;
+  font: inherit;
+  background: var(--ui-panel);
+}

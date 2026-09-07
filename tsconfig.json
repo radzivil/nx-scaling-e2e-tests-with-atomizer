@@ -8,6 +8,24 @@
     },
     {
       "path": "./apps/shop"
+    },
+    {
+      "path": "./apps/admin-e2e"
+    },
+    {
+      "path": "./apps/admin"
+    },
+    {
+      "path": "./apps/docs-e2e"
+    },
+    {
+      "path": "./apps/docs"
+    },
+    {
+      "path": "./libs/ui"
+    },
+    {
+      "path": "./libs/formatting"
     }
   ],
   "compilerOptions": {}

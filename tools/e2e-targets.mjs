@@ -49,8 +49,16 @@ function main() {
   const args = process.argv.slice(2);
   const shardArg = args.find((a) => a.startsWith('--shard='))?.split('=')[1];
   const shard = shardArg ? parseShard(shardArg) : null;
+  const affected = args.includes('--affected');
 
-  const discovered = projectsWithAtomizedTargets({ affected: args.includes('--affected') }).map(({ project, targets }) => ({
+  // Used by CI to build its matrix from the graph, so adding an app to the
+  // workspace adds a runner without anyone editing the workflow.
+  if (args.includes('--projects-json')) {
+    console.log(JSON.stringify(projectsWithAtomizedTargets({ affected }).map(({ project }) => project)));
+    return;
+  }
+
+  const discovered = projectsWithAtomizedTargets({ affected }).map(({ project, targets }) => ({
     project,
     targets: shard ? shardOf(targets, shard.index, shard.total) : targets,
   }));

@@ -14,8 +14,8 @@ Ten spec files, 56 tests, measured on an M-series laptop:
 | Run | Command | Wall clock |
 | --- | --- | --- |
 | One task, all specs | `nx e2e shop-e2e` | **~1m 33s** |
-| Atomized, one at a time | `node tools/shard-e2e.mjs --parallel=1` | **~1m 55s** |
-| Atomized, 5 at a time | `node tools/shard-e2e.mjs --parallel=5` | **~40s** |
+| Atomized, one at a time | `node tools/run-e2e.mjs --parallel=1` | **~1m 55s** |
+| Atomized, 5 at a time | `node tools/run-e2e.mjs --parallel=5` | **~40s** |
 | Re-run, nothing changed | same command again | **~0.15s** |
 | Re-run after 2 specs fail | same command again | only the 2 failures execute |
 
@@ -108,12 +108,12 @@ npx nx run "shop-e2e:e2e-ci--src/e2e/catalog.cy.ts"
 
 So the split is free; only the convenience wrapper is gated. Ask for the target
 list yourself and you are back in business — which is exactly what
-`tools/shard-e2e.mjs` does.
+`tools/run-e2e.mjs` does.
 
 ### 4 — Parallel, no cloud
 
 ```bash
-node tools/shard-e2e.mjs --parallel=5
+node tools/run-e2e.mjs --parallel=5
 ```
 
 ~1m 33s → ~40s on one laptop, with nothing but a shard script.
@@ -130,7 +130,7 @@ reports green on a red suite.
 Run the exact same command again:
 
 ```bash
-node tools/shard-e2e.mjs --parallel=5
+node tools/run-e2e.mjs --parallel=5
 ```
 
 ```
@@ -148,7 +148,7 @@ This is the part worth the ticket price. Seed a real bug:
 
 ```bash
 npm run demo:break
-node tools/shard-e2e.mjs --parallel=5
+node tools/run-e2e.mjs --parallel=5
 ```
 
 Two specs fail: `cart-totals` and `checkout-happy-path`. Both assert totals on a
@@ -158,7 +158,7 @@ $10.
 Now run it again **without changing anything**:
 
 ```bash
-node tools/shard-e2e.mjs --parallel=5
+node tools/run-e2e.mjs --parallel=5
 ```
 
 ```
@@ -184,7 +184,7 @@ Put it back:
 
 ```bash
 npm run demo:fix
-node tools/shard-e2e.mjs --parallel=5
+node tools/run-e2e.mjs --parallel=5
 ```
 
 ```
@@ -201,9 +201,9 @@ cache, `nx reset` first, this step honestly re-runs all ten.)
 ### 7 — Distribute across machines
 
 ```bash
-node tools/shard-e2e.mjs --shard=1/3 --parallel=2
-node tools/shard-e2e.mjs --shard=2/3 --parallel=2
-node tools/shard-e2e.mjs --shard=3/3 --parallel=2
+node tools/run-e2e.mjs --shard=1/3 --parallel=2
+node tools/run-e2e.mjs --shard=2/3 --parallel=2
+node tools/run-e2e.mjs --shard=3/3 --parallel=2
 ```
 
 Same discovery, sliced. The shard function deals targets out round-robin rather
@@ -294,7 +294,7 @@ apps/shop/                       React + Vite shop under test
   src/app/lib/demo-flags.ts      flipped by demo:break / demo:fix
 apps/shop-e2e/src/e2e/           10 spec files → 10 atomized targets
 tools/e2e-targets.mjs            discovers the atomized targets
-tools/shard-e2e.mjs              runs one deterministic slice of them
+tools/run-e2e.mjs              runs them: all, one app, or one shard
 tools/demo-flag.mjs              seeds and removes the pricing bug
 .github/workflows/e2e.yml        single-machine job + 3-way sharded matrix
 ```
@@ -306,15 +306,16 @@ tools/demo-flag.mjs              seeds and removes the pricing bug
 | `npm run dev` | shop on :4200 |
 | `npm run e2e` | baseline, un-atomized, one Cypress process |
 | `npm run e2e:parallel` | **all atomized targets, 5 at a time — the main demo command** |
-| `npm run e2e:ci` | same thing at `--parallel=3`, matching the CI job |
 | `npm run e2e:affected` | only projects changed against `main`, 5 at a time |
 | `npm run e2e:open` | Cypress interactive |
 | `npm run e2e:targets` | list the atomized targets |
-| `npm run e2e:shard -- --shard=1/3 --parallel=2` | run one slice |
+| `npm run e2e:parallel -- --project=shop-e2e` | one app only (the CI matrix axis) |
+| `npm run e2e:shard -- --project=shop-e2e --shard=1/2 --parallel=3` | half of one app |
+| `npm run e2e:benchmark` | re-measure every number in this file |
 | `npm run demo:break` / `demo:fix` / `demo:status` | the seeded bug |
 | `npm run cache:clear` | `nx reset` |
 
-Every one of these goes through `tools/shard-e2e.mjs` rather than
+Every one of these goes through `tools/run-e2e.mjs` rather than
 `nx run-many -t e2e-ci`, because that form is gated behind Nx Cloud on Nx 23
 (see step 3). Extra flags pass straight through to Nx:
 

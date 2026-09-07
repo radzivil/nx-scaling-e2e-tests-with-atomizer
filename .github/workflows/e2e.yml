@@ -10,12 +10,91 @@ concurrency:
   group: e2e-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  SHARDS: 3
-
 jobs:
-  # One machine, Nx scheduling the atomized targets across cores.
-  # This is the "before you distribute" reference point for the talk.
+  # The matrix is read out of the Nx graph rather than written down here, so
+  # adding a fourth app to the workspace adds a fourth runner on its own.
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      projects: ${{ steps.list.outputs.projects }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - id: list
+        run: echo "projects=$(node tools/e2e-targets.mjs --projects-json)" >> "$GITHUB_OUTPUT"
+
+  # Rung 3 of the ladder: one runner per app, each running its own specs in
+  # parallel. Each runner boots exactly one preview server and needs no
+  # balancing while the apps are similarly sized.
+  per-app:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: ${{ fromJson(needs.discover.outputs.projects) }}
+    name: ${{ matrix.project }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Restore the Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - run: npx cypress install
+
+      # With DISPLAY unset, every Cypress process spawns its own Xvfb on :99.
+      # Run two atomized targets at once and the second one dies with
+      # "Server is already active for display 99" — *after* its tests passed,
+      # so the task fails with a green test report. One shared X server for the
+      # whole job avoids the race.
+      - name: Start a shared X server
+        run: |
+          command -v Xvfb >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq xvfb; }
+          Xvfb :99 -screen 0 1280x1024x24 &
+          echo "DISPLAY=:99" >> "$GITHUB_ENV"
+
+      # Cache the whole .nx directory, not just .nx/cache. The stored task
+      # outputs live in .nx/cache but the index that maps a task hash to them
+      # lives in .nx/workspace-data. Restore only the former and Nx cannot see
+      # any of it — you get a warm archive and 0% hits.
+      #
+      # Keyed per app so the runners are not racing to write one key.
+      - name: Restore the Nx cache
+        uses: actions/cache@v4
+        with:
+          path: .nx
+          key: nx-${{ matrix.project }}-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            nx-${{ matrix.project }}-${{ runner.os }}-
+
+      - run: node tools/run-e2e.mjs --project=${{ matrix.project }} --parallel=5
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-${{ matrix.project }}
+          path: apps/*-e2e/test-output
+          retention-days: 5
+
+  # Rung 2, kept as the reference point the talk measures against: every app's
+  # specs on one machine. The gap between this and per-app is the argument for
+  # having a matrix at all.
   single-machine:
     runs-on: ubuntu-latest
     steps:
@@ -38,25 +117,12 @@ jobs:
 
       - run: npx cypress install
 
-      # With DISPLAY unset, every Cypress process spawns its own Xvfb on :99.
-      # Run two atomized targets at once and the second one dies with
-      # "Server is already active for display 99" — *after* its tests passed,
-      # so the task fails with a green test report. One shared X server for the
-      # whole job avoids the race.
       - name: Start a shared X server
         run: |
           command -v Xvfb >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq xvfb; }
           Xvfb :99 -screen 0 1280x1024x24 &
           echo "DISPLAY=:99" >> "$GITHUB_ENV"
 
-      # The cache is what makes a re-run cheap: tasks that already passed for
-      # this exact input hash are replayed instead of re-executed, so a retry
-      # only really runs the specs that failed.
-      #
-      # Cache the whole .nx directory, not just .nx/cache. The stored task
-      # outputs live in .nx/cache but the index that maps a task hash to them
-      # lives in .nx/workspace-data. Restore only the former and Nx cannot see
-      # any of it — you get a warm archive and 0% hits.
       - name: Restore the Nx cache
         uses: actions/cache@v4
         with:
@@ -65,24 +131,27 @@ jobs:
           restore-keys: |
             nx-single-${{ runner.os }}-
 
-      - run: node tools/shard-e2e.mjs --parallel=3
+      - run: node tools/run-e2e.mjs --parallel=5
 
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-single-machine
-          path: apps/shop-e2e/test-output
+          path: apps/*-e2e/test-output
           retention-days: 5
 
-  # The same targets dealt across N runners. This is the part Nx Cloud would
-  # normally do for you; a matrix plus a deterministic shard function gets you
-  # most of the way there for free.
-  sharded:
+  # Rung 4, and only worth it when one app is big enough to dominate the
+  # critical path. Splitting one app across two runners is the same idea as
+  # per-app, applied a level down. Shard a single app at a time: run-many takes
+  # a cross product, so a shard spanning apps that share a spec filename cannot
+  # be expressed — tools/run-e2e.mjs refuses that rather than quietly over-run.
+  shard-one-app:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2]
+    name: shop-e2e shard ${{ matrix.shard }}/2
     steps:
       - uses: actions/checkout@v5
         with:
@@ -103,33 +172,25 @@ jobs:
 
       - run: npx cypress install
 
-      # With DISPLAY unset, every Cypress process spawns its own Xvfb on :99.
-      # Run two atomized targets at once and the second one dies with
-      # "Server is already active for display 99" — *after* its tests passed,
-      # so the task fails with a green test report. One shared X server for the
-      # whole job avoids the race.
       - name: Start a shared X server
         run: |
           command -v Xvfb >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq xvfb; }
           Xvfb :99 -screen 0 1280x1024x24 &
           echo "DISPLAY=:99" >> "$GITHUB_ENV"
 
-      # Each shard keeps its own cache. Sharing one cache across shards would
-      # mean three jobs racing to write the same key and mostly losing.
-      # See the single-machine job for why this is .nx and not .nx/cache.
       - name: Restore the Nx cache
         uses: actions/cache@v4
         with:
           path: .nx
-          key: nx-shard${{ matrix.shard }}-${{ runner.os }}-${{ github.sha }}
+          key: nx-shopshard${{ matrix.shard }}-${{ runner.os }}-${{ github.sha }}
           restore-keys: |
-            nx-shard${{ matrix.shard }}-${{ runner.os }}-
+            nx-shopshard${{ matrix.shard }}-${{ runner.os }}-
 
-      - run: node tools/shard-e2e.mjs --shard=${{ matrix.shard }}/${{ env.SHARDS }} --parallel=2
+      - run: node tools/run-e2e.mjs --project=shop-e2e --shard=${{ matrix.shard }}/2 --parallel=3
 
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: cypress-shard-${{ matrix.shard }}
-          path: apps/shop-e2e/test-output
+          name: cypress-shop-shard-${{ matrix.shard }}
+          path: apps/*-e2e/test-output
           retention-days: 5

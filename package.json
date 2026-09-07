@@ -7,12 +7,12 @@
     "build": "nx build shop",
     "preview": "nx run shop:preview",
     "e2e": "nx e2e shop-e2e",
-    "e2e:open": "nx open-cypress shop-e2e",
-    "e2e:parallel": "node tools/shard-e2e.mjs --parallel=5",
-    "e2e:ci": "node tools/shard-e2e.mjs --parallel=3",
-    "e2e:affected": "node tools/shard-e2e.mjs --affected --parallel=5",
+    "e2e:parallel": "node tools/run-e2e.mjs --parallel=5",
+    "e2e:affected": "node tools/run-e2e.mjs --affected --parallel=5",
+    "e2e:shard": "node tools/run-e2e.mjs",
     "e2e:targets": "node tools/e2e-targets.mjs",
-    "e2e:shard": "node tools/shard-e2e.mjs",
+    "e2e:benchmark": "node tools/benchmark.mjs",
+    "e2e:open": "nx open-cypress shop-e2e",
     "demo:break": "node tools/demo-flag.mjs break",
     "demo:fix": "node tools/demo-flag.mjs fix",
     "demo:status": "node tools/demo-flag.mjs status",
@@ -20,6 +20,8 @@
   },
   "private": true,
   "devDependencies": {
+    "@babel/core": "^7.14.5",
+    "@babel/preset-react": "^7.14.5",
     "@nx/cypress": "^23.2.0",
     "@nx/js": "23.2.0",
     "@nx/react": "^23.2.0",
@@ -41,7 +43,8 @@
     "vite": "^8.0.0"
   },
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "libs/*"
   ],
   "dependencies": {
     "react": "^19.0.0",
