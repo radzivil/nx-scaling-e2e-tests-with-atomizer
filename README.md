@@ -243,6 +243,12 @@ teams never turn them on.
   locally when you are writing a test.
 - **Cache the Cypress binary in CI too.** Otherwise every shard re-downloads
   ~200 MB and eats the time you just saved.
+- **On Linux CI, give Cypress one X server.** With `DISPLAY` unset each Cypress
+  process starts its own Xvfb on `:99`, so the moment you run two atomized
+  targets concurrently the second dies with `Server is already active for
+  display 99` — *after* its tests passed, which means a green test report and a
+  failed task. Start one `Xvfb :99` for the job and export `DISPLAY`. This bit
+  this repo on its very first CI run; see `.github/workflows/e2e.yml`.
 - **`nx reset`** clears the local cache when you want to demo a cold run.
 
 ## Layout

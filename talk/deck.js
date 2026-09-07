@@ -619,7 +619,7 @@ function bullets(s, items, opts = {}) {
     x: M,
     y: 2.4,
     w: 5.6,
-    h: 0.75,
+    h: 0.84,
     fill: '10131A',
     stroke: '10131A',
     fontSize: 15,
@@ -1128,7 +1128,7 @@ function bullets(s, items, opts = {}) {
       { text: '  - uses: actions/cache@v4          # .nx/cache, per shard', color: C.muted },
       { text: '  - run: node tools/shard-e2e.mjs --shard=${{ matrix.shard }}/3', color: C.accent },
     ],
-    { y: 1.95, w: 7.4, fontSize: 13 }
+    { y: 1.95, w: 7.9, fontSize: 12 }
   );
 
   bullets(
@@ -1138,7 +1138,7 @@ function bullets(s, items, opts = {}) {
       { text: 'Round-robin, not contiguous blocks — adjacent specs cost alike', color: C.body },
       { text: 'Restore .nx/cache per shard so a re-run of a red job is cheap', color: C.body },
     ],
-    { x: 8.3, y: 2.0, w: 4.3, fontSize: 14, h: 2.4 }
+    { x: 8.8, y: 1.95, w: 3.8, fontSize: 13, h: 2.4 }
   );
 
   s.addText('What Nx Cloud still buys you', {
@@ -1188,6 +1188,7 @@ function bullets(s, items, opts = {}) {
       h: 0.85,
       isTextBox: true,
       margin: 0,
+      valign: 'top',
       fontFace: F.body,
       fontSize: 12,
       color: C.muted,

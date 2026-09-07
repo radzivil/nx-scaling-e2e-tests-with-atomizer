@@ -53,3 +53,5 @@ test-output
 
 # local editor helper
 .claude/
+talk/slide-*.jpg
+talk/*.pdf
