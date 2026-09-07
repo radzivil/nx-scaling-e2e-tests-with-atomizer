@@ -52,10 +52,15 @@ jobs:
       # The cache is what makes a re-run cheap: tasks that already passed for
       # this exact input hash are replayed instead of re-executed, so a retry
       # only really runs the specs that failed.
+      #
+      # Cache the whole .nx directory, not just .nx/cache. The stored task
+      # outputs live in .nx/cache but the index that maps a task hash to them
+      # lives in .nx/workspace-data. Restore only the former and Nx cannot see
+      # any of it — you get a warm archive and 0% hits.
       - name: Restore the Nx cache
         uses: actions/cache@v4
         with:
-          path: .nx/cache
+          path: .nx
           key: nx-single-${{ runner.os }}-${{ github.sha }}
           restore-keys: |
             nx-single-${{ runner.os }}-
@@ -111,10 +116,11 @@ jobs:
 
       # Each shard keeps its own cache. Sharing one cache across shards would
       # mean three jobs racing to write the same key and mostly losing.
+      # See the single-machine job for why this is .nx and not .nx/cache.
       - name: Restore the Nx cache
         uses: actions/cache@v4
         with:
-          path: .nx/cache
+          path: .nx
           key: nx-shard${{ matrix.shard }}-${{ runner.os }}-${{ github.sha }}
           restore-keys: |
             nx-shard${{ matrix.shard }}-${{ runner.os }}-

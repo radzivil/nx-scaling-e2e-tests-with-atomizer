@@ -243,16 +243,26 @@ teams never turn them on.
   locally when you are writing a test.
 - **Cache the Cypress binary in CI too.** Otherwise every shard re-downloads
   ~200 MB and eats the time you just saved.
-- **Nx 23 keeps its cache outside the workspace.** The default is
-  `~/.nx/<hash-of-workspace-path>/cache`, *not* `.nx/cache`. Every CI recipe
-  you will find online caches `.nx/cache`, which on Nx 23 caches an empty
-  directory and silently gives you 0% hits — this repo's first CI run did
-  exactly that. `nx.json` here sets `"cacheDirectory": ".nx/cache"` to pull it
-  back into the workspace where `actions/cache` can see it. Check yours with:
+- **Caching `.nx/cache` in CI does nothing on Nx 23.** Two separate traps, and
+  this repo hit both before CI went green:
 
-  ```bash
-  node -e "console.log(require('nx/src/utils/cache-directory').cacheDir)"
-  ```
+  1. The default cache directory is no longer in your workspace at all — it is
+     `~/.nx/<hash-of-workspace-path>/cache`. So `path: .nx/cache` archives an
+     empty directory. `nx.json` here sets `"cacheDirectory": ".nx/cache"` to
+     pull it back where `actions/cache` can see it. Check yours with:
+
+     ```bash
+     node -e "console.log(require('nx/src/utils/cache-directory').cacheDir)"
+     ```
+
+  2. Even then, `.nx/cache` alone is not enough. The task *outputs* live there,
+     but the index mapping a task hash to them lives in `.nx/workspace-data`.
+     Restore one without the other and Nx reports a clean **0% hit rate** while
+     sitting on a perfectly good cache. Cache the whole `.nx` directory.
+
+  The failure mode is nasty because nothing errors — CI is green, the cache
+  step says "Cache restored from key", and you just quietly pay full price
+  every run.
 
 - **On Linux CI, give Cypress one X server.** With `DISPLAY` unset each Cypress
   process starts its own Xvfb on `:99`, so the moment you run two atomized
