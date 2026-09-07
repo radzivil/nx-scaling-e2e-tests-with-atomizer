@@ -1125,7 +1125,7 @@ function bullets(s, items, opts = {}) {
       { text: 'strategy:', color: '7DD3FC' },
       { text: '  matrix: { shard: [1, 2, 3] }', color: C.text },
       { text: 'steps:', color: '7DD3FC' },
-      { text: '  - uses: actions/cache@v4          # .nx/cache, per shard', color: C.muted },
+      { text: '  - uses: actions/cache@v4          # path: .nx  (all of it)', color: C.muted },
       { text: '  - run: node tools/shard-e2e.mjs --shard=${{ matrix.shard }}/3', color: C.accent },
     ],
     { y: 1.95, w: 7.9, fontSize: 12 }
@@ -1136,7 +1136,8 @@ function bullets(s, items, opts = {}) {
     [
       { text: 'Discovery is the same; only the slice differs', color: C.body },
       { text: 'Round-robin, not contiguous blocks — adjacent specs cost alike', color: C.body },
-      { text: 'Restore .nx/cache per shard so a re-run of a red job is cheap', color: C.body },
+      { text: 'Cache all of .nx per shard, so a re-run of a red job is cheap', color: C.body },
+      { text: 'Measured here: 1m 32s cold → 38s with the cache restored', color: C.accent, bold: true },
     ],
     { x: 8.8, y: 1.95, w: 3.8, fontSize: 13, h: 2.4 }
   );
@@ -1194,7 +1195,7 @@ function bullets(s, items, opts = {}) {
       color: C.muted,
     });
   });
-  notes(s, 'Do not oversell. The argument is that the free tier of this idea is unclaimed, not that the paid product is pointless.');
+  notes(s, 'Do not oversell. The argument is that the free tier of this idea is unclaimed, not that the paid product is pointless. The 1m32s to 38s figure is from this repo\'s own Actions runs, same commit run twice; the e2e step itself drops to 31ms and what remains is checkout plus npm ci.');
 }
 
 /* ── 14 gotchas ───────────────────────────────────────────────────── */

@@ -215,6 +215,20 @@ tend to exercise the same feature at a similar cost — `checkout-happy-path` an
 restored per shard. Re-running a failed CI job then behaves exactly like step 6:
 the passing specs replay from cache and only the failures burn minutes.
 
+Measured on this repo's own GitHub Actions runs — the same commit, run twice:
+
+| Job | Cold | Cache restored |
+| --- | --- | --- |
+| `single-machine` | 2m 7s | **47s** |
+| `sharded (1)` | 1m 32s | **38s** |
+| `sharded (2)` | 1m 42s | **37s** |
+| `sharded (3)` | 1m 6s | **40s** |
+
+The e2e step itself drops to `Run duration: 31ms — Cache: 5/6 hit (83%)`. What
+is left is checkout, `npm ci` and the Cypress binary. Worth saying on stage:
+once the tests are cached, **your CI time is your setup time**, and that is the
+next thing to attack.
+
 ## What Nx Cloud still buys you
 
 Be honest about this on stage:
