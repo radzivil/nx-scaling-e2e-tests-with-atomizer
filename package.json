@@ -1,0 +1,50 @@
+{
+  "name": "nx-scaling-e2e-tests-with-atomizer",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nx run shop:dev",
+    "build": "nx build shop",
+    "preview": "nx run shop:preview",
+    "e2e": "nx e2e shop-e2e",
+    "e2e:open": "nx open-cypress shop-e2e",
+    "e2e:ci": "nx run-many -t e2e-ci --parallel=5",
+    "e2e:affected": "nx affected -t e2e-ci --parallel=5",
+    "e2e:targets": "node tools/e2e-targets.mjs",
+    "e2e:shard": "node tools/shard-e2e.mjs",
+    "demo:break": "node tools/demo-flag.mjs break",
+    "demo:fix": "node tools/demo-flag.mjs fix",
+    "demo:status": "node tools/demo-flag.mjs status",
+    "cache:clear": "nx reset"
+  },
+  "private": true,
+  "devDependencies": {
+    "@nx/cypress": "^23.2.0",
+    "@nx/js": "23.2.0",
+    "@nx/react": "^23.2.0",
+    "@nx/vite": "23.2.0",
+    "@nx/web": "23.2.0",
+    "@swc-node/register": "1.11.1",
+    "@swc/core": "1.15.8",
+    "@swc/helpers": "0.5.18",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.0",
+    "cypress": "^15.20.1",
+    "jiti": "2.4.2",
+    "nx": "23.2.0",
+    "prettier": "^3.8.1",
+    "tslib": "^2.3.0",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.0"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "6.30.3"
+  }
+}

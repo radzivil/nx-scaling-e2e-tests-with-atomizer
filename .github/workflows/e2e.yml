@@ -1,0 +1,107 @@
+name: e2e
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SHARDS: 3
+
+jobs:
+  # One machine, Nx scheduling the atomized targets across cores.
+  # This is the "before you distribute" reference point for the talk.
+  single-machine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Restore the Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - run: npx cypress install
+
+      # The cache is what makes a re-run cheap: tasks that already passed for
+      # this exact input hash are replayed instead of re-executed, so a retry
+      # only really runs the specs that failed.
+      - name: Restore the Nx cache
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: nx-single-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            nx-single-${{ runner.os }}-
+
+      - run: node tools/shard-e2e.mjs --parallel=3
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-single-machine
+          path: apps/shop-e2e/test-output
+          retention-days: 5
+
+  # The same targets dealt across N runners. This is the part Nx Cloud would
+  # normally do for you; a matrix plus a deterministic shard function gets you
+  # most of the way there for free.
+  sharded:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Restore the Cypress binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - run: npx cypress install
+
+      # Each shard keeps its own cache. Sharing one cache across shards would
+      # mean three jobs racing to write the same key and mostly losing.
+      - name: Restore the Nx cache
+        uses: actions/cache@v4
+        with:
+          path: .nx/cache
+          key: nx-shard${{ matrix.shard }}-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            nx-shard${{ matrix.shard }}-${{ runner.os }}-
+
+      - run: node tools/shard-e2e.mjs --shard=${{ matrix.shard }}/${{ env.SHARDS }} --parallel=2
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-shard-${{ matrix.shard }}
+          path: apps/shop-e2e/test-output
+          retention-days: 5
