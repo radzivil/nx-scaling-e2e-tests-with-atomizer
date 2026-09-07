@@ -4,6 +4,7 @@
  *   node tools/e2e-targets.mjs                 # human-readable list
  *   node tools/e2e-targets.mjs --json          # machine-readable
  *   node tools/e2e-targets.mjs --shard=2/3     # only this shard's slice
+ *   node tools/e2e-targets.mjs --affected      # only projects touched vs main
  */
 import { execFileSync } from 'node:child_process';
 
@@ -11,8 +12,8 @@ export const CI_TARGET_PREFIX = 'e2e-ci--';
 
 const nx = (...args) => execFileSync('npx', ['nx', ...args], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
 
-export function projectsWithAtomizedTargets() {
-  const projects = JSON.parse(nx('show', 'projects', '--json'));
+export function projectsWithAtomizedTargets({ affected = false } = {}) {
+  const projects = JSON.parse(nx('show', 'projects', ...(affected ? ['--affected'] : []), '--json'));
 
   return projects
     .map((project) => {
@@ -49,7 +50,7 @@ function main() {
   const shardArg = args.find((a) => a.startsWith('--shard='))?.split('=')[1];
   const shard = shardArg ? parseShard(shardArg) : null;
 
-  const discovered = projectsWithAtomizedTargets().map(({ project, targets }) => ({
+  const discovered = projectsWithAtomizedTargets({ affected: args.includes('--affected') }).map(({ project, targets }) => ({
     project,
     targets: shard ? shardOf(targets, shard.index, shard.total) : targets,
   }));

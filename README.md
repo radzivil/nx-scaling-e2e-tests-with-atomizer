@@ -304,11 +304,22 @@ tools/demo-flag.mjs              seeds and removes the pricing bug
 | Script | What it does |
 | --- | --- |
 | `npm run dev` | shop on :4200 |
-| `npm run e2e` | baseline, un-atomized |
+| `npm run e2e` | baseline, un-atomized, one Cypress process |
+| `npm run e2e:parallel` | **all atomized targets, 5 at a time — the main demo command** |
+| `npm run e2e:ci` | same thing at `--parallel=3`, matching the CI job |
+| `npm run e2e:affected` | only projects changed against `main`, 5 at a time |
 | `npm run e2e:open` | Cypress interactive |
 | `npm run e2e:targets` | list the atomized targets |
 | `npm run e2e:shard -- --shard=1/3 --parallel=2` | run one slice |
 | `npm run demo:break` / `demo:fix` / `demo:status` | the seeded bug |
 | `npm run cache:clear` | `nx reset` |
+
+Every one of these goes through `tools/shard-e2e.mjs` rather than
+`nx run-many -t e2e-ci`, because that form is gated behind Nx Cloud on Nx 23
+(see step 3). Extra flags pass straight through to Nx:
+
+```bash
+npm run e2e:parallel -- --skip-nx-cache
+```
 
 Demo login: `demo@nxshop.test` / `nx-atomizer`

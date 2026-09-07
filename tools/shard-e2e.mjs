@@ -2,8 +2,10 @@
  * Runs one deterministic slice of the atomized e2e targets.
  *
  *   node tools/shard-e2e.mjs                          # every target
+ *   node tools/shard-e2e.mjs --parallel=5             # five at a time
  *   node tools/shard-e2e.mjs --shard=2/3              # this machine's slice
  *   node tools/shard-e2e.mjs --shard=2/3 --parallel=2 # ...two at a time
+ *   node tools/shard-e2e.mjs --affected               # only what changed
  *
  * Sharding is the only thing this script does itself. Running the slice is
  * delegated to `nx run-many`, which already schedules tasks, honours the cache
@@ -18,9 +20,14 @@ const arg = (name, fallback) => args.find((a) => a.startsWith(`--${name}=`))?.sp
 
 const shard = args.some((a) => a.startsWith('--shard=')) ? parseShard(arg('shard')) : null;
 const parallel = arg('parallel', '1');
+const affected = args.includes('--affected');
 
-const discovered = projectsWithAtomizedTargets();
+const discovered = projectsWithAtomizedTargets({ affected });
 if (discovered.length === 0) {
+  if (affected) {
+    console.log('Nothing affected. No e2e projects changed — exiting green.');
+    process.exit(0);
+  }
   console.error('No atomized e2e targets found. Is @nx/cypress/plugin registered in nx.json?');
   process.exit(1);
 }
@@ -29,7 +36,7 @@ const work = discovered
   .map(({ project, targets }) => ({ project, targets: shard ? shardOf(targets, shard.index, shard.total) : targets }))
   .filter(({ targets }) => targets.length > 0);
 
-const label = shard ? `shard ${shard.index}/${shard.total}` : 'all shards';
+const label = [shard ? `shard ${shard.index}/${shard.total}` : 'all shards', affected ? '(affected only)' : ''].filter(Boolean).join(' ');
 const count = work.reduce((sum, { targets }) => sum + targets.length, 0);
 
 if (count === 0) {
@@ -47,7 +54,9 @@ const nxArgs = [
   `--targets=${work.flatMap((w) => w.targets).join(',')}`,
   `--parallel=${parallel}`,
   // '--output-style=stream',
-  ...args.filter((a) => !a.startsWith('--shard=') && !a.startsWith('--parallel=')),
+  // Everything else is passed straight through to Nx (--skip-nx-cache,
+  // --verbose, --output-style=...). Our own flags are not Nx flags.
+  ...args.filter((a) => !a.startsWith('--shard=') && !a.startsWith('--parallel=') && a !== '--affected'),
 ];
 
 spawn('npx', nxArgs, { stdio: 'inherit' }).on('exit', (code) => process.exit(code ?? 1));
