@@ -17,8 +17,11 @@ Keynote.
 Two placeholders are deliberately loud on slide 1 and will embarrass you on a
 projector if you skip this:
 
-1. **Your title and LinkedIn handle.** Edit `SPEAKER` at the top of `deck.js`.
-2. **The LinkedIn QR.** Put your profile URL in `qr-links.json`, then:
+1. **Your photo.** Save it as `talk/assets/avatar.png` (or `.jpg`). It is
+   cropped to a circle, so a square headshot works best — anything from about
+   400x400 up is plenty. Without it slide 1 shows a dashed "PHOTO" circle.
+2. **Your title and LinkedIn handle.** Edit `SPEAKER` at the top of `deck.js`.
+3. **The LinkedIn QR.** Put your profile URL in `qr-links.json`, then:
 
    ```bash
    node talk/make-qr.mjs

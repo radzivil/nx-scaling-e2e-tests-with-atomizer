@@ -41,6 +41,32 @@ const SPEAKER = {
 };
 
 /**
+ * The speaker photo, cropped to a circle. Looks for assets/avatar.{png,jpg,jpeg}
+ * and falls back to a dashed placeholder so a missing file is obvious on the
+ * projector rather than a silent gap.
+ */
+function avatar(s, { x, y, size }) {
+  const found = ['png', 'jpg', 'jpeg']
+    .map((ext) => path.join(__dirname, `assets/avatar.${ext}`))
+    .find((f) => fs.existsSync(f));
+
+  if (found) {
+    s.addImage({ path: found, x, y, w: size, h: size, rounding: true });
+    return;
+  }
+  s.addShape(pres.ShapeType.ellipse, {
+    x, y, w: size, h: size,
+    fill: { color: '1B2029' },
+    line: { color: 'FB7185', width: 1.5, dashType: 'dash' },
+  });
+  s.addText('PHOTO', {
+    x, y, w: size, h: size, isTextBox: true, margin: 0,
+    align: 'center', valign: 'middle',
+    fontFace: F.body, fontSize: 11, color: 'FB7185',
+  });
+}
+
+/**
  * A QR code on a white plate so it stays scannable on a dark slide. When the
  * PNG has not been generated yet, draws a loud placeholder instead of a dead
  * square — a QR that silently points nowhere is worse than an obvious gap.
@@ -247,12 +273,14 @@ function bullets(s, items, opts = {}) {
 
   s.addShape(pres.ShapeType.rect, { x: M, y: 4.35, w: 1.1, h: 0.035, fill: { color: C.accent }, line: { width: 0 } });
 
+  avatar(s, { x: M, y: 4.62, size: 1.35 });
+
   s.addText(SPEAKER.name, {
-    x: M, y: 4.7, w: 8.6, h: 0.45, isTextBox: true, margin: 0,
+    x: M + 1.65, y: 4.83, w: 6.9, h: 0.45, isTextBox: true, margin: 0,
     fontFace: F.body, fontSize: 22, bold: true, color: C.text,
   });
   s.addText(SPEAKER.title, {
-    x: M, y: 5.15, w: 8.6, h: 0.4, isTextBox: true, margin: 0,
+    x: M + 1.65, y: 5.28, w: 6.9, h: 0.4, isTextBox: true, margin: 0,
     fontFace: F.body, fontSize: 15, color: C.body,
   });
 
