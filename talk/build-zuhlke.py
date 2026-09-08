@@ -260,33 +260,46 @@ def build(prs):
     # 01 cover ---------------------------------------------------------------
     s = add(prs, "Title slide | big picture & gradient")
     drop(s, "Picture Placeholder")
+
+    # The logo lives on the layout, not the slide, so it can only be resized
+    # there. Only the cover uses this layout, so nothing else is affected.
+    logo_w = 1.7
+    logo_mid = 10.43                      # horizontal centre of the white panel
+    for sh in layout(prs, "Title slide | big picture & gradient").shapes:
+        if sh.name == "Grafik 10":
+            sh.width = sh.height = Inches(logo_w)
+            sh.left = Inches(logo_mid - logo_w / 2)
+            sh.top = Inches(2.2)
+
     for ph in s.placeholders:
         idx = ph.placeholder_format.idx
         if idx == 0:
             write(ph.text_frame, "Scaling E2E Tests the Smart Way with Nx", size=28, font=HEAD, color=WHITE)
         elif idx == 1:
-            write(ph.text_frame, "Atomizing, parallelising and caching a Cypress suite — without Nx Cloud", size=14, color=WHITE)
+            write(ph.text_frame, "Atomizing, parallelising and caching a Cypress suite — without Nx Cloud",
+                  size=14, color=WHITE)
         elif idx == 15:
             ph._element.getparent().remove(ph._element)
-    # The right panel runs 7.53 → 13.33 and the master's logo floats at its top
-    # right (10.45, 0.60). Everything else is one centred stack under it, so the
-    # photo, name and QR share an axis instead of stair-stepping.
-    # Share the logo's vertical axis rather than the panel's — one visible axis
-    # reads as deliberate; centring on an invisible panel leaves the logo looking
-    # nudged off to one side.
-    panel_mid = 10.45 + 1.10 / 2
 
-    photo = 1.8
-    picture(s, ASSETS / "avatar.jpg", panel_mid - photo / 2, 2.0, photo, photo)
+    # Photo and QR sit as matching white cards in the gradient's empty top-left,
+    # which the template otherwise leaves blank. The plate behind the photo keeps
+    # it from floating on the gradient and matches the QR's treatment.
+    tile = 1.55
+    for i, kind in enumerate(("photo", "qr")):
+        x = M + i * (tile + 0.22)
+        rect(s, x, 0.85, tile, tile, fill=WHITE, outline=None)
+        if kind == "photo":
+            picture(s, ASSETS / "avatar.jpg", x + 0.08, 0.93, tile - 0.16, tile - 0.16)
+        else:
+            picture(s, ASSETS / "qr-linkedin.png", x + 0.08, 0.93, tile - 0.16, tile - 0.16)
+    write(textbox(s, M + tile + 0.22, 2.52, 3.0, 0.3), "Connect on LinkedIn", size=11, color=WHITE)
 
-    write(textbox(s, panel_mid - 2.0, 4.02, 4.0, 0.4, align=PP_ALIGN.CENTER),
+    write(textbox(s, logo_mid - 2.0, 4.3, 4.0, 0.4, align=PP_ALIGN.CENTER),
           SPEAKER, size=18, font=HEAD, color=INK)
-    # "Zuhlke" is redundant next to the logo, and dropping it keeps this on one line
-    write(textbox(s, panel_mid - 2.0, 4.46, 4.0, 0.38, align=PP_ALIGN.CENTER),
+    # "Zuhlke" is redundant directly under the logo, and dropping it keeps one line
+    write(textbox(s, logo_mid - 2.0, 4.75, 4.0, 0.38, align=PP_ALIGN.CENTER),
           "Principal Consultant & Partner", size=12, color=BODY)
 
-    qr_size = 1.5
-    qr(s, "linkedin", panel_mid - qr_size / 2, 5.0, qr_size, "Connect on LinkedIn")
     notes(s, "Thirty seconds on who you are, then move.\n\nBEFORE YOU PRESENT\n"
              "  $ npm ci && npx cypress install\n  $ npm run demo:status   -> buggyDiscount: false\n"
              "  $ npx nx reset")
