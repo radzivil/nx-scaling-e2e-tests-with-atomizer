@@ -268,10 +268,25 @@ def build(prs):
             write(ph.text_frame, "Atomizing, parallelising and caching a Cypress suite — without Nx Cloud", size=14, color=WHITE)
         elif idx == 15:
             ph._element.getparent().remove(ph._element)
-    picture(s, ASSETS / "avatar.jpg", 8.35, 1.75, 1.65, 1.65)
-    write(textbox(s, 10.2, 1.95, 2.6, 0.4), SPEAKER, size=16, font=HEAD, color=INK)
-    write(textbox(s, 10.2, 2.4, 2.9, 0.7), ROLE, size=12, color=BODY)
-    qr(s, "linkedin", 8.35, 3.8, 2.1, "Connect on LinkedIn")
+    # The right panel runs 7.53 → 13.33 and the master's logo floats at its top
+    # right (10.45, 0.60). Everything else is one centred stack under it, so the
+    # photo, name and QR share an axis instead of stair-stepping.
+    # Share the logo's vertical axis rather than the panel's — one visible axis
+    # reads as deliberate; centring on an invisible panel leaves the logo looking
+    # nudged off to one side.
+    panel_mid = 10.45 + 1.10 / 2
+
+    photo = 1.8
+    picture(s, ASSETS / "avatar.jpg", panel_mid - photo / 2, 2.0, photo, photo)
+
+    write(textbox(s, panel_mid - 2.0, 4.02, 4.0, 0.4, align=PP_ALIGN.CENTER),
+          SPEAKER, size=18, font=HEAD, color=INK)
+    # "Zuhlke" is redundant next to the logo, and dropping it keeps this on one line
+    write(textbox(s, panel_mid - 2.0, 4.46, 4.0, 0.38, align=PP_ALIGN.CENTER),
+          "Principal Consultant & Partner", size=12, color=BODY)
+
+    qr_size = 1.5
+    qr(s, "linkedin", panel_mid - qr_size / 2, 5.0, qr_size, "Connect on LinkedIn")
     notes(s, "Thirty seconds on who you are, then move.\n\nBEFORE YOU PRESENT\n"
              "  $ npm ci && npx cypress install\n  $ npm run demo:status   -> buggyDiscount: false\n"
              "  $ npx nx reset")
