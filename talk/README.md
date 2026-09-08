@@ -1,5 +1,32 @@
 # Slides
 
+Two editions, same content:
+
+| File | Built by | Design |
+| --- | --- | --- |
+| `Scaling-E2E-Tests-with-Nx.pptx` | `deck.js` (pptxgenjs) | dark, conference-style |
+| `Scaling-E2E-Tests-with-Nx-Zuhlke.pptx` | `build-zuhlke.py` (python-pptx) | Zuhlke master template |
+
+## The Zuhlke edition
+
+Built on the real Zuhlke master template, so it inherits the theme, the slide
+masters, the gradient cover and the standard footer. The template comes from the
+`zuhlke-slides` skill, which is **not vendored here** — clone it first:
+
+```bash
+git clone https://codehub.zuehlke.com/ai-sdlc/zapac-agent-skills.git
+python talk/build-zuhlke.py --skill <checkout>/zuhlke-slides
+```
+
+Needs `python-pptx`. The build ends with the skill's mandatory `verify_pptx()`
+gate and refuses to write a deck that fails it.
+
+Colours are the template's own custom palette (purple `985B9C`, blue `0099CC`,
+green `00CC66`, orange `FF9900`); typography follows the skill's
+`design-guidelines.md`. The presenter name and date are stamped into the slide
+master, because the footer is inherited and cannot be set per slide.
+
+
 `deck.js` generates `Scaling-E2E-Tests-with-Nx.pptx` with
 [pptxgenjs](https://gitbrent.github.io/PptxGenJS/). The `.pptx` is committed, so
 you only need this if you want to change a slide.

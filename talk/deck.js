@@ -1509,8 +1509,8 @@ const DEMO = {
 
   const bars = [
     { rung: '1', label: 'Un-atomized, one process per app', v: 260, color: 'F5A524' },
-    { rung: '2', label: 'Atomized, but still serial', v: 342, color: 'C2410C' },
-    { rung: '3', label: 'Atomized, 5 at a time, one machine', v: 152, color: '0B7A44' },
+    { rung: '2', label: 'Atomized, but still serial', v: 340, color: 'C2410C' },
+    { rung: '3', label: 'Atomized, 5 at a time, one machine', v: 140, color: '0B7A44' },
     { rung: '4', label: 'One runner per app, 5 at a time each', v: 55, color: '0B7A44' },
     { rung: '—', label: 'Re-run, nothing changed', v: 5, color: '15803D' },
   ];
@@ -1545,7 +1545,7 @@ const DEMO = {
     s.addShape(pres.ShapeType.roundRect, {
       x: M + 4.5,
       y: y + 0.07,
-      w: Math.max(0.08, (b.v / 342) * maxW),
+      w: Math.max(0.08, (b.v / 340) * maxW),
       h: 0.32,
       rectRadius: 0.04,
       fill: { color: b.color },
@@ -1553,7 +1553,7 @@ const DEMO = {
     });
     const mins = Math.floor(b.v / 60);
     s.addText(`${mins ? `${mins}m ` : ''}${b.v % 60}s`, {
-      x: M + 4.6 + Math.max(0.08, (b.v / 342) * maxW),
+      x: M + 4.6 + Math.max(0.08, (b.v / 340) * maxW),
       y,
       w: 1.5,
       h: 0.4,
