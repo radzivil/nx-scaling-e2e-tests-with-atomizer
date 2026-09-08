@@ -511,14 +511,14 @@ def build(prs):
         ("       - shop-e2e:e2e-ci", {}),
         ('Please enable Nx Cloud or use the slower "e2e" task.', {}),
     ], size=11, font=MONO, color=INK, line=1.2)
-    write(textbox(s, M, 4.85, 11.9, 0.45), "The gate is on the wrapper, not on the work.",
-          size=18, font=HEAD, color=GREEN_DEEP)
+    write(textbox(s, M, 4.85, 11.9, 0.45), "So now it is a procurement question.",
+          size=18, font=HEAD, color=ORANGE_DEEP)
     bullets(s, M, 5.4, 11.9, [
-        "e2e-ci is a no-op coordinator that depends on that app's ten real tasks",
-        "The ten atomized targets are ordinary nx:run-commands tasks",
-        "Run one directly and it works, cache and all",
-    ], size=12)
-    notes(s, "This slide did not exist last time — Nx 23 added the guard.\n\nDEMO\n"
+        "Nx Cloud is a premium service from Nx",
+        "Is it approved in your organisation?",
+        ("If not approved — you are blocked", {"color": ORANGE_DEEP, "bold": True}),
+    ], size=13, gap=0.45)
+    notes(s, "Sit on the third bullet — for much of the room this is a purchase order, not a technical problem. The good news is the next slide.\n\nDEMO\n"
              "  $ npx nx run-many -t e2e-ci --parallel=5        (fails)\n"
              '  $ npx nx run "shop-e2e:e2e-ci--src/e2e/catalog.cy.ts"   (~25s cold, green)')
 

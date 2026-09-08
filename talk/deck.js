@@ -1077,7 +1077,7 @@ const DEMO = {
     }
   );
 
-  s.addText('The gate is on the wrapper, not on the work.', {
+  s.addText('So now it is a procurement question.', {
     x: M,
     y: 5.1,
     w: 11.9,
@@ -1087,21 +1087,21 @@ const DEMO = {
     fontFace: F.head,
     fontSize: 24,
     bold: true,
-    color: C.accent,
+    color: C.warn,
   });
 
   bullets(
     s,
     [
-      { text: 'e2e-ci is a no-op coordinator that just depends on that app\'s ten real tasks', color: C.body },
-      { text: 'The ten atomized targets are ordinary nx:run-commands tasks', color: C.body },
-      { text: 'Run one directly and it works, cache and all', color: C.body },
+      { text: 'Nx Cloud is a premium service from Nx', color: C.body },
+      { text: 'Is it approved in your organisation?', color: C.body },
+      { text: 'If not approved — you are blocked', color: C.hot, bold: true },
     ],
-    { y: 5.65, w: 11.9, h: 1.5, fontSize: 14 }
+    { y: 5.65, w: 11.9, h: 1.5, fontSize: 15 }
   );
   notes(
     s,
-    'This is the slide that did not exist last time. Nx 23 added the guard. Show the error live, then immediately run one atomized target directly to prove the split itself is free.' + DEMO.gate
+    'This is the slide that did not exist last time — Nx 23 added the guard. Do not rush to the workaround: sit on the third bullet. For a lot of the room this is not a technical problem at all, it is a purchase order they are not going to win this quarter. The good news lands on the next slide.' + DEMO.gate
   );
 }
 
