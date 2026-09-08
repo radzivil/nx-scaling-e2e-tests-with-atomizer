@@ -109,9 +109,15 @@ npx nx run-many -t e2e-ci --parallel=5
 On Nx 23 this **fails**:
 
 ```
-NX   The shop-e2e:e2e-ci task should only be run with Nx Cloud.
-     Please enable Nx Cloud or use the slower "e2e" task.
+NX   The following tasks should only be run with Nx Cloud:
+  - admin-e2e:e2e-ci
+  - docs-e2e:e2e-ci
+  - shop-e2e:e2e-ci
+Please enable Nx Cloud or use the slower "e2e" task.
 ```
+
+(Scoped to one project — `nx run-many --projects=shop-e2e -t e2e-ci` — you get
+the singular version of the same refusal.)
 
 The guard is on the `e2e-ci` **coordinator** target only. The atomized targets
 underneath it are ordinary `nx:run-commands` tasks and run perfectly well on
