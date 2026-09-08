@@ -269,7 +269,7 @@ def build(prs):
         if sh.name == "Grafik 10":
             sh.width = sh.height = Inches(logo_w)
             sh.left = Inches(logo_mid - logo_w / 2)
-            sh.top = Inches(2.2)
+            sh.top = Inches(3.75 - logo_w / 2)   # vertical centre of the panel
 
     for ph in s.placeholders:
         idx = ph.placeholder_format.idx
@@ -285,20 +285,20 @@ def build(prs):
     # which the template otherwise leaves blank. The plate behind the photo keeps
     # it from floating on the gradient and matches the QR's treatment.
     tile = 1.55
-    for i, kind in enumerate(("photo", "qr")):
-        x = M + i * (tile + 0.22)
-        rect(s, x, 0.85, tile, tile, fill=WHITE, outline=None)
-        if kind == "photo":
-            picture(s, ASSETS / "avatar.jpg", x + 0.08, 0.93, tile - 0.16, tile - 0.16)
-        else:
-            picture(s, ASSETS / "qr-linkedin.png", x + 0.08, 0.93, tile - 0.16, tile - 0.16)
-    write(textbox(s, M + tile + 0.22, 2.52, 3.0, 0.3), "Connect on LinkedIn", size=11, color=WHITE)
+    qr_x = 5.5
 
-    write(textbox(s, logo_mid - 2.0, 4.3, 4.0, 0.4, align=PP_ALIGN.CENTER),
-          SPEAKER, size=18, font=HEAD, color=INK)
-    # "Zuhlke" is redundant directly under the logo, and dropping it keeps one line
-    write(textbox(s, logo_mid - 2.0, 4.75, 4.0, 0.38, align=PP_ALIGN.CENTER),
-          "Principal Consultant & Partner", size=12, color=BODY)
+    rect(s, M, 0.85, tile, tile, fill=WHITE, outline=None)
+    picture(s, ASSETS / "avatar.jpg", M + 0.08, 0.93, tile - 0.16, tile - 0.16)
+
+    # name and role sit beside the photo, optically centred against the card
+    write(textbox(s, M + tile + 0.3, 1.2, 2.8, 0.42), SPEAKER, size=18, font=HEAD, color=WHITE)
+    # "Zuhlke" is redundant with the logo on the same slide, and dropping it keeps one line
+    write(textbox(s, M + tile + 0.3, 1.66, 2.8, 0.4), "Principal Consultant & Partner",
+          size=12, color=WHITE)
+
+    rect(s, qr_x, 0.85, tile, tile, fill=WHITE, outline=None)
+    picture(s, ASSETS / "qr-linkedin.png", qr_x + 0.08, 0.93, tile - 0.16, tile - 0.16)
+    write(textbox(s, qr_x, 2.52, 3.0, 0.3), "Connect on LinkedIn", size=11, color=WHITE)
 
     notes(s, "Thirty seconds on who you are, then move.\n\nBEFORE YOU PRESENT\n"
              "  $ npm ci && npx cypress install\n  $ npm run demo:status   -> buggyDiscount: false\n"
