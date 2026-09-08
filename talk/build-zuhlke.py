@@ -276,7 +276,7 @@ def build(prs):
         if idx == 0:
             write(ph.text_frame, "Scaling E2E Tests the Smart Way with Nx", size=28, font=HEAD, color=WHITE)
         elif idx == 1:
-            write(ph.text_frame, "Atomizing, parallelising and caching a Cypress suite — without Nx Cloud",
+            write(ph.text_frame, "Making your slowest quality gate fast enough to actually use and trust on every pull request",
                   size=14, color=WHITE)
         elif idx == 15:
             ph._element.getparent().remove(ph._element)

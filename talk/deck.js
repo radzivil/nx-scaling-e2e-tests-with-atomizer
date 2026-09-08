@@ -359,21 +359,28 @@ const DEMO = {
     x: M, y: 2.42, w: 8.6, h: 0.95, isTextBox: true, margin: 0,
     fontFace: F.head, fontSize: 50, bold: true, color: C.accent,
   });
-  s.addText('Atomizing, parallelising and caching a Cypress suite — without Nx Cloud', {
-    x: M, y: 3.5, w: 8.6, h: 0.45, isTextBox: true, margin: 0,
-    fontFace: F.body, fontSize: 17, color: C.body,
-  });
+  // Explicit break — left to wrap on its own this orphans "request" on line two
+  s.addText(
+    [
+      { text: 'Making your slowest quality gate fast enough', options: { breakLine: true } },
+      { text: 'to actually use and trust on every pull request', options: {} },
+    ],
+    {
+      x: M, y: 3.5, w: 8.6, h: 0.85, isTextBox: true, margin: 0,
+      fontFace: F.body, fontSize: 17, color: C.body, lineSpacingMultiple: 1.15,
+    }
+  );
 
-  s.addShape(pres.ShapeType.rect, { x: M, y: 4.35, w: 1.1, h: 0.035, fill: { color: C.accent }, line: { width: 0 } });
+  s.addShape(pres.ShapeType.rect, { x: M, y: 4.62, w: 1.1, h: 0.035, fill: { color: C.accent }, line: { width: 0 } });
 
-  avatar(s, { x: M, y: 4.62, size: 1.35 });
+  avatar(s, { x: M, y: 4.9, size: 1.35 });
 
   s.addText(SPEAKER.name, {
-    x: M + 1.65, y: 4.83, w: 6.9, h: 0.45, isTextBox: true, margin: 0,
+    x: M + 1.65, y: 5.11, w: 6.9, h: 0.45, isTextBox: true, margin: 0,
     fontFace: F.body, fontSize: 22, bold: true, color: C.text,
   });
   s.addText(SPEAKER.title, {
-    x: M + 1.65, y: 5.28, w: 6.9, h: 0.4, isTextBox: true, margin: 0,
+    x: M + 1.65, y: 5.56, w: 6.9, h: 0.4, isTextBox: true, margin: 0,
     fontFace: F.body, fontSize: 15, color: C.body,
   });
 
