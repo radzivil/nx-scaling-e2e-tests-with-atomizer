@@ -325,7 +325,16 @@ teams never turn them on.
 
 - **More parallel is not more faster.** `--parallel` counts Cypress processes,
   and each one drags a browser along, so the ceiling sits well below your core
-  count. Measured on a 10-core M1 Pro over all 30 targets:
+  count. `tools/run-e2e.mjs` therefore defaults to **half your cores** and prints
+  what it chose:
+
+  ```
+  Running 30 atomized target(s) — all apps — with --parallel=5 (half of 10 cores):
+  ```
+
+  Half is not a law about CPUs — it is cores divided by what one task costs, and
+  a Cypress target costs about two. Unit tests cost one, and half would idle the
+  machine. Measured on a 10-core M1 Pro over all 30 targets:
 
   | | Runs | Mean wall clock | Red runs |
   | --- | --- | --- | --- |
@@ -334,8 +343,14 @@ teams never turn them on.
 
   Identical throughput, 40% failure rate. The spec that failed
   (`admin-e2e settings-save.cy.ts`) passes on its own in 13s, so it is
-  contention hitting Cypress's default timeouts, not a bug. Find your own
-  ceiling before you raise the number; past it you buy variance for free.
+  contention hitting Cypress's default timeouts, not a bug. Watch memory too:
+  each Cypress plus browser is 0.5-1 GB, so a big-core-count laptop can hit swap
+  before it runs out of cores. Measure your own ceiling before raising it.
+
+  Nx accepts `--parallel=50%` on the command line, but the same value in
+  `nx.json` crashes it with `The "setMaxListeners" argument must be of type
+  number. Received type string ('10%110')` — it concatenates rather than parses.
+  Hence computing the number in the script, where it can also be printed.
 
 - **Atomization is not free per task.** Each atomized target boots its own
   Cypress process. All 30 specs serially through the atomizer is *slower* than
@@ -424,8 +439,8 @@ Each app gets its own ports so three preview servers can run side by side.
 | --- | --- |
 | `npm run dev` | shop on :4200 |
 | `npm run e2e` | baseline, un-atomized, one Cypress process |
-| `npm run e2e:parallel` | **all atomized targets, 5 at a time — the main demo command** |
-| `npm run e2e:affected` | only projects changed against `main`, 5 at a time |
+| `npm run e2e:parallel` | **all atomized targets, half your cores at a time — the main demo command** |
+| `npm run e2e:affected` | only projects changed against `main` |
 | `npm run e2e:open` | Cypress interactive |
 | `npm run e2e:targets` | list the atomized targets |
 | `npm run e2e:parallel -- --project=shop-e2e` | one app only (the CI matrix axis) |

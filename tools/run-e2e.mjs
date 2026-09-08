@@ -1,7 +1,7 @@
 /**
  * Runs atomized e2e targets, optionally narrowed to one app or one shard.
  *
- *   node tools/run-e2e.mjs --parallel=5                    # everything, 5 at a time
+ *   node tools/run-e2e.mjs                                 # everything, half your cores
  *   node tools/run-e2e.mjs --project=shop-e2e --parallel=5 # one app  (the CI matrix axis)
  *   node tools/run-e2e.mjs --project=shop-e2e --shard=1/2  # half of one app
  *   node tools/run-e2e.mjs --affected --parallel=5         # only what the graph says changed
@@ -22,13 +22,32 @@
  * tasks, honours the cache and manages the web servers.
  */
 import { spawn } from 'node:child_process';
+import { cpus } from 'node:os';
+
 import { parseShard, projectsWithAtomizedTargets, shardOf } from './e2e-targets.mjs';
+
+/**
+ * Half the cores, by default.
+ *
+ * Not a law about CPUs — it is cores divided by what one task actually costs,
+ * and a Cypress target is a Node process *plus* a browser, so roughly two.
+ * Measured on a 10-core M1 Pro: 5 and 8 both averaged 141s over all 30 targets,
+ * but 8 failed 2 runs in 5 while 5 stayed green. Past the ceiling you buy
+ * variance, not speed.
+ *
+ * Nx accepts `--parallel=50%` on the command line, but the same value in
+ * nx.json crashes it, so the number is computed here where it can also be
+ * printed. Override with --parallel=N and measure before you trust it.
+ */
+const CORES = cpus().length;
+const DEFAULT_PARALLEL = Math.max(1, Math.floor(CORES / 2));
 
 const args = process.argv.slice(2);
 const arg = (name, fallback) => args.find((a) => a.startsWith(`--${name}=`))?.split('=')[1] ?? fallback;
 
 const shard = args.some((a) => a.startsWith('--shard=')) ? parseShard(arg('shard')) : null;
-const parallel = arg('parallel', '1');
+const parallel = arg('parallel', String(DEFAULT_PARALLEL));
+const parallelIsDefault = !args.some((a) => a.startsWith('--parallel='));
 const affected = args.includes('--affected');
 const only = arg('project')?.split(',').filter(Boolean) ?? null;
 
@@ -72,7 +91,8 @@ if (count === 0) {
   process.exit(0);
 }
 
-console.log(`Running ${count} atomized target(s) — ${scope} — with --parallel=${parallel}:`);
+const why = parallelIsDefault ? ` (half of ${CORES} cores)` : '';
+console.log(`Running ${count} atomized target(s) — ${scope} — with --parallel=${parallel}${why}:`);
 for (const { project, targets } of work) {
   const specs = targets.map((t) => t.slice(t.lastIndexOf('/') + 1).replace(/\.cy\.ts$/, ''));
   console.log(`  ${project.padEnd(12)} ${String(targets.length).padStart(2)}  ${specs.join(', ')}`);

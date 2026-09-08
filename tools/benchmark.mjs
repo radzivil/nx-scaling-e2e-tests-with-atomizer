@@ -10,11 +10,14 @@
  * whole point of the replay.
  */
 import { execFileSync, spawnSync } from 'node:child_process';
+import { cpus } from 'node:os';
 import { projectsWithAtomizedTargets } from './e2e-targets.mjs';
 
 const args = process.argv.slice(2);
 const quick = args.includes('--quick');
-const parallel = args.find((a) => a.startsWith('--parallel='))?.split('=')[1] ?? '5';
+// same default as run-e2e.mjs: half the cores
+const parallel = args.find((a) => a.startsWith('--parallel='))?.split('=')[1]
+  ?? String(Math.max(1, Math.floor(cpus().length / 2)));
 
 const run = (cmd, cmdArgs) => {
   const started = Date.now();
@@ -28,7 +31,8 @@ const discovered = await projectsWithAtomizedTargets();
 const targetCount = discovered.reduce((n, d) => n + d.targets.length, 0);
 const e2eProjects = discovered.map((d) => d.project);
 
-console.log(`${targetCount} atomized targets across ${e2eProjects.length} projects: ${e2eProjects.join(', ')}\n`);
+console.log(`${targetCount} atomized targets across ${e2eProjects.length} projects: ${e2eProjects.join(', ')}`);
+console.log(`${cpus().length} cores detected — running the parallel rungs at --parallel=${parallel}\n`);
 
 const results = [];
 
