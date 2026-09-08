@@ -345,25 +345,26 @@ def build(prs):
 
     # 04-06 three questions, one at a time -----------------------------------
     qs = [
-        ("Who runs E2E tests?", "Most hands go up."),
-        ("Whose suite is green right now?", "Fewer hands. Some laughter."),
-        ("Who blocks a PR on it?", "Almost none."),
+        "Who is using E2E tests?",
+        "Whose suite is green right now?",
+        "Who blocks a PR on it?",
     ]
     asides = [
-        "Ask it and actually wait. Nearly every hand goes up — this is not a niche problem.",
-        "The hands thin out and someone laughs. Do not rush past the laugh.",
-        "Almost nobody gates a merge on a suite they cannot trust. Reveal the line and move on.",
+        "Ask it and actually wait. Expect nearly every hand — this is not a niche problem.",
+        "Expect far fewer hands, and a laugh. Do not rush past the laugh.",
+        "Expect almost none. Nobody gates a merge on a suite they cannot trust. Reveal the line and move on.",
     ]
     for shown in range(1, 4):
         s = add(prs, "Only title")
         heading(s, "Section 01 · The problem", "A few questions for the room", kicker_color=ORANGE)
-        for i, (q, expect) in enumerate(qs):
+        for i, q in enumerate(qs):
             x = M + i * 4.05
             live = i < shown
-            rect(s, x, CONTENT_TOP + 0.25, 3.75, 2.4,
+            rect(s, x, CONTENT_TOP + 0.25, 3.75, 2.0,
                  fill=WHITE if live else WASH, outline=LINE)
             if not live:
-                write(textbox(s, x, CONTENT_TOP + 1.25, 3.75, 0.6, align=PP_ALIGN.CENTER),
+                write(textbox(s, x, CONTENT_TOP + 0.25, 3.75, 2.0,
+                              align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE),
                       str(i + 1), size=30, font=HEAD, color=RGBColor.from_string("D9D9D9"))
                 continue
             tone = ORANGE_25 if i == 2 else GREEN_25
@@ -371,9 +372,7 @@ def build(prs):
             write(textbox(s, x + 0.25, CONTENT_TOP + 0.5, 0.55, 0.55,
                           align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE),
                   str(i + 1), size=16, font=HEAD, color=INK)
-            write(textbox(s, x + 0.25, CONTENT_TOP + 1.25, 3.25, 0.85), q, size=16, font=HEAD, color=INK)
-            write(textbox(s, x + 0.25, CONTENT_TOP + 2.1, 3.25, 0.4),
-                  expect, size=11, color=MUTED)
+            write(textbox(s, x + 0.25, CONTENT_TOP + 1.15, 3.25, 0.85), q, size=16, font=HEAD, color=INK)
         if shown == 3:
             rect(s, M, 5.0, 11.97, 1.0, fill=ORANGE_25, outline=ORANGE)
             write(textbox(s, M + 0.28, 5.2, 11.4, 0.7),

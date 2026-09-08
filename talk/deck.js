@@ -470,14 +470,14 @@ const DEMO = {
 /* ── 04-06 the problem · one question at a time ─────────────────────── */
 {
   const qs = [
-    ['Who runs E2E tests?', 'Most hands go up.'],
-    ['Whose suite is green right now?', 'Fewer hands. Some laughter.'],
-    ['Who blocks a PR on it?', 'Almost none.'],
+    'Who is using E2E tests?',
+    'Whose suite is green right now?',
+    'Who blocks a PR on it?',
   ];
   const asides = [
-    'Ask it, then actually wait for the hands. Nearly everyone puts one up, which is the point — this is not a niche problem.',
-    'Second question, same room. The hands thin out and someone usually laughs. Do not rush past that laugh, it is the whole talk in one reaction.',
-    'Third question kills it. Almost nobody gates a merge on a suite they cannot trust. Now reveal the line at the bottom and move — you have earned the next ten minutes.',
+    'Ask it, then actually wait for the hands. Expect nearly everyone — that is the point, this is not a niche problem.',
+    'Second question, same room. Expect far fewer hands and some laughter. Do not rush past that laugh — it is the whole talk in one reaction.',
+    'Third question kills it. Expect almost no hands — nobody gates a merge on a suite they cannot trust. Reveal the line at the bottom and move; you have earned the next ten minutes.',
   ];
 
   // One slide per question so the room answers them one at a time. The cards
@@ -488,13 +488,13 @@ const DEMO = {
     kicker(s, 'Section 01 · The problem', 'B45309');
     title(s, 'A few questions for the room', '10131A');
 
-    qs.forEach(([q, expect], i) => {
+    qs.forEach((q, i) => {
       const x = M + i * 4.05;
       const revealed = i < shown;
       const isLast = i === qs.length - 1;
 
       s.addShape(pres.ShapeType.roundRect, {
-        x, y: 2.2, w: 3.75, h: 2.55, rectRadius: 0.09,
+        x, y: 2.2, w: 3.75, h: 1.9, rectRadius: 0.09,
         fill: { color: revealed ? 'FFFFFF' : 'F2F4F7' },
         line: revealed
           ? { color: 'E2E6ED', width: 1 }
@@ -503,7 +503,7 @@ const DEMO = {
 
       if (!revealed) {
         s.addText(String(i + 1), {
-          x, y: 2.2, w: 3.75, h: 2.55, isTextBox: true, margin: 0,
+          x, y: 2.2, w: 3.75, h: 1.9, isTextBox: true, margin: 0,
           align: 'center', valign: 'middle',
           fontFace: F.head, fontSize: 40, bold: true, color: 'D8DEE7',
         });
@@ -520,26 +520,22 @@ const DEMO = {
         fontFace: F.body, fontSize: 20, bold: true, color: isLast ? '8D1B22' : '14603C',
       });
       s.addText(q, {
-        x: x + 0.25, y: 3.25, w: 3.25, h: 0.9, isTextBox: true, margin: 0,
+        x: x + 0.25, y: 3.22, w: 3.25, h: 0.8, isTextBox: true, margin: 0,
         valign: 'top',
         fontFace: F.body, fontSize: 19, bold: true, color: '10131A',
-      });
-      s.addText(expect, {
-        x: x + 0.25, y: 4.15, w: 3.25, h: 0.45, isTextBox: true, margin: 0,
-        fontFace: F.body, fontSize: 13, italic: true, color: '8A94A6',
       });
     });
 
     // the punchline only lands once all three have been asked
     if (shown === qs.length) {
       s.addShape(pres.ShapeType.roundRect, {
-        x: M, y: 5.25, w: W - 2 * M, h: 1.15, rectRadius: 0.07,
+        x: M, y: 4.75, w: W - 2 * M, h: 1.15, rectRadius: 0.07,
         fill: { color: 'FFF7E6' }, line: { color: 'F5A524', width: 1 },
       });
       s.addText(
         'The distance between the first hand and the last one is this talk. Nobody blocks a merge on a suite that takes an hour and fails for reasons nobody trusts.',
         {
-          x: M + 0.3, y: 5.45, w: W - 2 * M - 0.6, h: 0.8, isTextBox: true, margin: 0,
+          x: M + 0.3, y: 4.95, w: W - 2 * M - 0.6, h: 0.8, isTextBox: true, margin: 0,
           fontFace: F.body, fontSize: 15, color: '5B4308',
         }
       );
