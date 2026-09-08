@@ -36,8 +36,8 @@ const path = require('node:path');
  */
 const SPEAKER = {
   name: 'Vladimir Radzivil',
-  title: 'SET YOUR ZUHLKE TITLE IN deck.js',
-  handle: 'SET YOUR LINKEDIN HANDLE IN deck.js',
+  title: 'Principal Consultant & Partner, Zühlke',
+  handle: 'linkedin.com/in/vladimirradzivil',
 };
 
 /**
@@ -367,6 +367,7 @@ function bullets(s, items, opts = {}) {
     });
     s.addText(q, {
       x: x + 0.25, y: 3.25, w: 3.25, h: 0.9, isTextBox: true, margin: 0,
+      valign: 'top',
       fontFace: F.body, fontSize: 19, bold: true, color: '10131A',
     });
     s.addText(expect, {
@@ -1016,7 +1017,7 @@ function bullets(s, items, opts = {}) {
       { text: 'Costs ~40s up front: discovery needs npm ci before anything starts', color: C.warn },
       { text: 'Measured: 3m 44s on one machine → 1m 53s across three', color: C.accent, bold: true },
     ],
-    { x: 8.8, y: 1.95, w: 3.8, fontSize: 12, h: 2.6 }
+    { x: 8.8, y: 1.95, w: 3.6, fontSize: 12, h: 2.6 }
   );
 
   s.addText('Why not shard by index?', {
