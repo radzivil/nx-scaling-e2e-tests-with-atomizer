@@ -1689,7 +1689,7 @@ function bullets(s, items, opts = {}) {
 {
   const s = darkSlide();
   kicker(s, 'Your turn');
-  title(s, 'Same problem? Steal this.');
+  title(s, 'Same problem? Help yourself.');
 
   const steps = [
     ['01', 'Clone the repo', 'Everything in this talk, measured and reproducible.'],
