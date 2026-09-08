@@ -1729,83 +1729,56 @@ function bullets(s, items, opts = {}) {
   );
 }
 
-/* ── 23 q&a ──────────────────────────────────────────────────────────── */
-{
-  const s = darkSlide();
-  kicker(s, 'Questions');
-  title(s, 'Q&A');
-
-  s.addText('Things I am happy to go deeper on:', {
-    x: M, y: 2.2, w: 7.6, h: 0.4, isTextBox: true, margin: 0,
-    fontFace: F.body, fontSize: 15, color: C.body,
-  });
-  bullets(
-    s,
-    [
-      { text: 'Why the Nx Cloud gate exists, and whether to just pay for it', color: C.body },
-      { text: 'Making this work with Playwright instead of Cypress', color: C.body },
-      { text: 'Flaky tests — what the cache does and does not fix', color: C.body },
-      { text: 'Sharding a single app that dominates the critical path', color: C.body },
-      { text: 'What it took to review 1,000 tests without stopping delivery', color: C.body },
-    ],
-    { x: M, y: 2.7, w: 7.6, fontSize: 15, h: 3.0 }
-  );
-
-  qrPanel(s, { file: 'assets/qr-repo.png', x: 9.6, y: 2.2, size: 2.7, caption: 'The repo' });
-
-  s.addText('github.com/radzivil/nx-scaling-e2e-tests-with-atomizer', {
-    x: M, y: 6.2, w: 11.9, h: 0.4, isTextBox: true, margin: 0,
-    fontFace: F.mono, fontSize: 13, color: C.muted,
-  });
-  notes(s, 'Leave this up for the whole Q&A. The bullet list is a prompt for the room when nobody wants to go first.');
-}
-
-/* ── 24 feedback & thanks ────────────────────────────────────────────── */
+/* ── 23 feedback & q&a ───────────────────────────────────────────────── */
 {
   const s = lightSlide();
   kicker(s, 'Thank you', '0B7A44');
-  title(s, 'How was it?', '10131A');
+  title(s, 'Feedback & Q&A', '10131A');
 
-  s.addText('Two minutes of feedback makes the next one better.', {
-    x: M, y: 2.15, w: 7.4, h: 0.5, isTextBox: true, margin: 0,
+  s.addText('Take a minute to give your feedback — it makes the next session better.', {
+    x: M, y: 2.05, w: 7.9, h: 0.5, isTextBox: true, margin: 0,
     fontFace: F.body, fontSize: 19, color: '10131A',
   });
 
-  const recap = [
-    'Splitting is generated, not maintained',
-    'Splitting alone is not a speedup — concurrency is',
-    'The cache is the retry story: failures are never cached',
-    'Distribute by app before you distribute by index',
-    'None of it needs Nx Cloud',
-  ];
   s.addText('What to take back', {
-    x: M, y: 2.95, w: 7.4, h: 0.35, isTextBox: true, margin: 0,
+    x: M, y: 2.9, w: 7.9, h: 0.35, isTextBox: true, margin: 0,
     fontFace: F.body, fontSize: 14, bold: true, charSpacing: 1, color: '8A94A6',
   });
   bullets(
     s,
-    recap.map((t) => ({ text: t, color: '10131A' })),
-    { x: M, y: 3.4, w: 7.4, fontSize: 14, h: 2.6 }
+    [
+      'Splitting is generated, not maintained',
+      'Splitting alone is not a speedup — concurrency is',
+      'The cache is the retry story: failures are never cached',
+      'Distribute by app before you distribute by index',
+      'None of it needs Nx Cloud',
+    ].map((t) => ({ text: t, color: '10131A' })),
+    { x: M, y: 3.35, w: 7.9, fontSize: 14, h: 2.6 }
   );
 
   qrPanel(s, {
     file: 'assets/qr-feedback.png',
-    x: 9.1, y: 2.1, size: 3.2,
+    x: 9.2, y: 2.05, size: 3.1,
     caption: 'Session feedback',
     dark: false,
   });
 
-  s.addText(SPEAKER.name + ' · ' + SPEAKER.handle, {
-    x: M, y: 6.35, w: 11.9, h: 0.4, isTextBox: true, margin: 0,
-    fontFace: F.body, fontSize: 14, color: '5C6675',
+  s.addText('github.com/radzivil/nx-scaling-e2e-tests-with-atomizer', {
+    x: M, y: 6.35, w: 7.9, h: 0.35, isTextBox: true, margin: 0,
+    fontFace: F.mono, fontSize: 13, color: '5C6675',
   });
+  s.addText(SPEAKER.name + ' · ' + SPEAKER.handle, {
+    x: M, y: 6.72, w: 7.9, h: 0.35, isTextBox: true, margin: 0,
+    fontFace: F.body, fontSize: 13, color: '8A94A6',
+  });
+
   notes(
     s,
-    'Put this up while you answer the last question so people can scan it before they stand. Read the recap only if the room is still settling; otherwise let them read it.'
+    'One slide for the whole close. Put it up before the first question so the QR is on screen for the entire Q&A — that is when people actually scan it. The recap is there for the room to read, not for you to read out. If nobody opens, the honest prompts are the Nx Cloud gate, Playwright instead of Cypress, and what the cache does and does not do for flaky tests.'
   );
 }
 
-/* ── 25 appendix ─────────────────────────────────────────────────────── */
+/* ── 24 appendix ─────────────────────────────────────────────────────── */
 {
   const s = darkSlide();
   s.addText('Appendix', {
@@ -1819,7 +1792,7 @@ function bullets(s, items, opts = {}) {
   notes(s, 'Skip past this unless someone asks. The gotchas slide behind it is the one people photograph.');
 }
 
-/* ── 26 gotchas ──────────────────────────────────────────────────────── */
+/* ── 25 gotchas ──────────────────────────────────────────────────────── */
 {
   const s = lightSlide();
   kicker(s, 'Before you try this at work', 'B45309');
