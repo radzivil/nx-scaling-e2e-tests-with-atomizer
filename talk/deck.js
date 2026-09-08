@@ -524,110 +524,114 @@ function bullets(s, items, opts = {}) {
   kicker(s, 'Section 01 · The example', '0B7A44');
   title(s, 'One repo, three apps, one graph', '10131A');
 
+  // Nx in its own words, so nobody has to take my paraphrase for it.
+  s.addShape(pres.ShapeType.roundRect, {
+    x: M, y: 1.72, w: W - 2 * M, h: 0.92, rectRadius: 0.08,
+    fill: { color: 'FFFFFF' }, line: { color: 'E2E6ED', width: 1 },
+  });
+  s.addText(
+    [
+      { text: '“A build system with smart caching and task orchestration.”', options: { bold: true, color: '10131A' } },
+      { text: '   nx.dev', options: { color: '8A94A6', fontSize: 12 } },
+    ],
+    {
+      x: M + 0.3, y: 1.85, w: W - 2 * M - 0.6, h: 0.35, isTextBox: true, margin: 0,
+      fontFace: F.body, fontSize: 15,
+    }
+  );
+  s.addText('It knows what depends on what, so it can skip work. It does not run your tests — Cypress still does that.', {
+    x: M + 0.3, y: 2.2, w: W - 2 * M - 0.6, h: 0.35, isTextBox: true, margin: 0,
+    fontFace: F.body, fontSize: 13, color: '5C6675',
+  });
+
   const apps = [
-    { name: 'shop', x: 0.75 },
-    { name: 'admin', x: 4.15 },
-    { name: 'docs', x: 7.55 },
+    { name: 'shop', x: 0.9 },
+    { name: 'admin', x: 5.2 },
+    { name: 'docs', x: 9.5 },
   ];
   const libs = [
-    { name: 'formatting', x: 2.35 },
-    { name: 'ui', x: 5.85 },
+    { name: 'formatting', x: 3.05 },
+    { name: 'ui', x: 7.35 },
   ];
 
-  // edges first, so the boxes sit on top of the line ends
-  const edges = [
-    { x: 2.0, y: 3.0, w: 1.6, h: 1.15, flipH: false }, // shop  -> formatting
-    { x: 3.6, y: 3.0, w: 1.8, h: 1.15, flipH: true },  // admin -> formatting
-    { x: 5.4, y: 3.0, w: 1.7, h: 1.15, flipH: false }, // admin -> ui
-    { x: 7.1, y: 3.0, w: 1.7, h: 1.15, flipH: true },  // docs  -> ui
-  ];
-  edges.forEach((e) => {
+  // edges first so the boxes cover the line ends
+  [
+    { x: 2.35, w: 2.15, flipH: false }, // shop  -> formatting
+    { x: 4.50, w: 2.15, flipH: true },  // admin -> formatting
+    { x: 6.65, w: 2.15, flipH: false }, // admin -> ui
+    { x: 8.80, w: 2.15, flipH: true },  // docs  -> ui
+  ].forEach((e) => {
     s.addShape(pres.ShapeType.line, {
-      x: e.x, y: e.y, w: e.w, h: e.h,
-      flipH: e.flipH,
+      x: e.x, y: 3.68, w: e.w, h: 0.8, flipH: e.flipH,
       line: { color: 'B8C0CC', width: 1.5 },
     });
   });
 
   apps.forEach((a) => {
+    s.addText('10 specs', {
+      x: a.x, y: 2.62, w: 2.9, h: 0.28, isTextBox: true, margin: 0,
+      align: 'center', fontFace: F.body, fontSize: 12, color: '8A94A6',
+    });
     s.addShape(pres.ShapeType.roundRect, {
-      x: a.x, y: 2.25, w: 2.5, h: 0.75, rectRadius: 0.08,
+      x: a.x, y: 2.93, w: 2.9, h: 0.75, rectRadius: 0.08,
       fill: { color: '10131A' }, line: { color: '10131A', width: 1 },
     });
     s.addText(a.name, {
-      x: a.x, y: 2.25, w: 2.5, h: 0.75, isTextBox: true, margin: 0,
+      x: a.x, y: 2.93, w: 2.9, h: 0.75, isTextBox: true, margin: 0,
       align: 'center', valign: 'middle',
       fontFace: F.mono, fontSize: 17, bold: true, color: 'FFFFFF',
-    });
-    s.addText('10 specs', {
-      x: a.x, y: 1.92, w: 2.5, h: 0.3, isTextBox: true, margin: 0,
-      align: 'center',
-      fontFace: F.body, fontSize: 12, color: '8A94A6',
     });
   });
 
   libs.forEach((l) => {
     s.addShape(pres.ShapeType.roundRect, {
-      x: l.x, y: 4.15, w: 2.5, h: 0.7, rectRadius: 0.08,
+      x: l.x, y: 4.48, w: 2.9, h: 0.7, rectRadius: 0.08,
       fill: { color: 'FFFFFF' }, line: { color: '0B7A44', width: 1.5 },
     });
     s.addText(l.name, {
-      x: l.x, y: 4.15, w: 2.5, h: 0.7, isTextBox: true, margin: 0,
+      x: l.x, y: 4.48, w: 2.9, h: 0.7, isTextBox: true, margin: 0,
       align: 'center', valign: 'middle',
       fontFace: F.mono, fontSize: 15, color: '0B7A44',
     });
   });
 
   s.addText('shared libs', {
-    x: 0.75, y: 4.3, w: 1.4, h: 0.4, isTextBox: true, margin: 0,
+    x: 0.9, y: 4.48, w: 1.95, h: 0.7, isTextBox: true, margin: 0,
     align: 'right', valign: 'middle',
     fontFace: F.body, fontSize: 12, italic: true, color: '8A94A6',
   });
 
-  // right-hand explainer
-  s.addShape(pres.ShapeType.roundRect, {
-    x: 10.3, y: 1.95, w: 2.3, h: 3.0, rectRadius: 0.08,
-    fill: { color: 'FFFFFF' }, line: { color: 'E2E6ED', width: 1 },
-  });
-  s.addText('What Nx is', {
-    x: 10.55, y: 2.15, w: 1.85, h: 0.35, isTextBox: true, margin: 0,
-    fontFace: F.body, fontSize: 15, bold: true, color: '10131A',
-  });
-  s.addText(
-    [
-      { text: 'A task graph over your repo.', options: { breakLine: true, paraSpaceAfter: 8 } },
-      { text: 'It knows what depends on what, runs tasks in the right order, and caches the results.', options: { breakLine: true, paraSpaceAfter: 8 } },
-      { text: 'It is not a test runner. Cypress still runs the tests.', options: {} },
-    ],
-    {
-      x: 10.55, y: 2.55, w: 1.85, h: 2.3, isTextBox: true, margin: 0,
-      fontFace: F.body, fontSize: 12, color: '5C6675', valign: 'top',
-    }
-  );
-
   [
     ['30', 'spec files', '0B7A44'],
     ['202', 'tests', '10131A'],
-    ['1', 'task, before we start', 'B45309'],
+    ['3', 'tasks that can run them', 'B45309'],
   ].forEach(([v, l, c], i) => {
     const x = M + i * 4.05;
     s.addShape(pres.ShapeType.roundRect, {
-      x, y: 5.3, w: 3.75, h: 1.35, rectRadius: 0.09,
+      x, y: 5.45, w: 3.75, h: 1.15, rectRadius: 0.09,
       fill: { color: 'FFFFFF' }, line: { color: 'E2E6ED', width: 1 },
     });
     s.addText(v, {
-      x: x + 0.25, y: 5.48, w: 3.25, h: 0.66, isTextBox: true, margin: 0,
-      fontFace: F.head, fontSize: 32, bold: true, color: c,
+      x: x + 0.25, y: 5.6, w: 3.25, h: 0.6, isTextBox: true, margin: 0,
+      fontFace: F.head, fontSize: 30, bold: true, color: c,
     });
     s.addText(l, {
-      x: x + 0.25, y: 6.14, w: 3.25, h: 0.35, isTextBox: true, margin: 0,
-      fontFace: F.body, fontSize: 14, color: '5C6675',
+      x: x + 0.25, y: 6.18, w: 3.25, h: 0.33, isTextBox: true, margin: 0,
+      fontFace: F.body, fontSize: 13, color: '5C6675',
     });
   });
 
+  s.addText(
+    'Thirty files, but only three things you can actually run — one e2e task per app. Closing that gap is the rest of the talk.',
+    {
+      x: M, y: 6.72, w: W - 2 * M, h: 0.4, isTextBox: true, margin: 0,
+      fontFace: F.body, fontSize: 14, italic: true, color: '5C6675',
+    }
+  );
+
   notes(
     s,
-    'Keep this short — it is orientation, not content. The one thing to point at is that the libs are shared unevenly: formatting by shop and admin, ui by admin and docs. That asymmetry is what makes the affected demo land later. Have `nx graph` open in a tab if you would rather show the real thing.'
+    'Orientation, not content — keep it under a minute. Two things to point at. One: the libs are shared unevenly, formatting by shop and admin, ui by admin and docs, which is what makes the affected demo land later. Two: thirty spec files but only three runnable tasks, because nx e2e is one Cypress process per app. That three is the number the atomizer turns into thirty. Have `nx graph` open in a tab if you would rather show the real thing.'
   );
 }
 
