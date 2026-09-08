@@ -14,8 +14,8 @@ Keynote.
 
 ## Before you present
 
-Two placeholders are deliberately loud on slide 1 and will embarrass you on a
-projector if you skip this:
+Three placeholders are deliberately loud on slide 1 and will embarrass you on a
+projector if you skip them:
 
 1. **Your photo.** Save it as `talk/assets/avatar.png` (or `.jpg`). It is
    cropped to a circle, so a square headshot works best — anything from about
