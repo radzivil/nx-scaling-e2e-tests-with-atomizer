@@ -788,9 +788,10 @@ def build(prs):
 
     # 25 gotchas -------------------------------------------------------------
     s = add(prs, "Only title")
-    heading(s, "Before you try this at work", "Six things that will bite you", kicker_color=ORANGE)
+    heading(s, "Before you try this at work", "Seven things that will bite you", kicker_color=ORANGE)
     items = [
         ("Per-task startup tax", "Each atomized target boots Cypress. Parallelism has to beat it."),
+        ("More parallel is not more faster", "--parallel=8 was no quicker than 5 on a 10-core laptop, and went red 2 runs in 5. Each target is a browser too."),
         ("e2e-ci is gated on Nx 23", "The wrapper needs Nx Cloud. The leaf targets do not."),
         ("The cache is not in .nx/cache", "Nx 23 puts it in ~/.nx/<hash>/cache. Most CI recipes cache the wrong path."),
         ("Parallel Cypress fights over :99", "Each process spawns its own Xvfb. Start one and export DISPLAY."),
@@ -798,13 +799,13 @@ def build(prs):
         ("App changes invalidate everything", "Correct, but it limits when failure-only retries help."),
     ]
     for i, (h, b) in enumerate(items):
-        y = CONTENT_TOP + i * 0.82
+        y = CONTENT_TOP + i * 0.72
         ellipse(s, M, y + 0.06, 0.28, fill=ORANGE_25)
         write(textbox(s, M, y + 0.06, 0.28, 0.28, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE),
               str(i + 1), size=11, font=HEAD, color=INK)
         write(textbox(s, M + 0.45, y, 4.6, 0.4), h, size=13, font=HEAD, color=INK)
         write(textbox(s, M + 5.3, y, 7.3, 0.5), b, size=12, color=BODY)
-    notes(s, "Leave this up during questions — it is the slide people photograph.")
+    notes(s, "Leave this up during questions — it is the slide people photograph. On item 2: five and eight came out at the same 141s mean, but eight failed two runs in five, and the spec that failed passes alone in 13s. Contention, not a bug.")
 
 
 

@@ -1896,10 +1896,11 @@ const DEMO = {
 {
   const s = lightSlide();
   kicker(s, 'Before you try this at work', 'B45309');
-  title(s, 'Six things that will bite you', '10131A');
+  title(s, 'Seven things that will bite you', '10131A');
 
   const items = [
     ['Per-task startup tax', 'Each atomized target boots Cypress. Parallelism has to beat it.'],
+    ['More parallel is not more faster', 'On a 10-core laptop --parallel=8 was no quicker than 5, and went red 2 runs in 5. Each target is a browser too.'],
     ['e2e-ci is gated on Nx 23', 'The wrapper needs Nx Cloud. The leaf targets do not.'],
     ['The cache is not in .nx/cache', 'Nx 23 puts it in ~/.nx/<hash>/cache. Every CI recipe online caches the wrong path.'],
     ['Parallel Cypress fights over :99', 'Each process spawns its own Xvfb. Start one and export DISPLAY.'],
@@ -1907,7 +1908,7 @@ const DEMO = {
     ['App changes invalidate everything', 'Correct, but it limits when failure-only retries help.'],
   ];
   items.forEach(([h, b], i) => {
-    const y = 2.05 + i * 0.85;
+    const y = 1.95 + i * 0.74;
     s.addShape(pres.ShapeType.ellipse, { x: M, y: y + 0.06, w: 0.4, h: 0.4, fill: { color: 'B45309' } });
     s.addText(String(i + 1), {
       x: M,
@@ -1949,7 +1950,7 @@ const DEMO = {
       color: '55607A',
     });
   });
-  notes(s, 'Good slide to leave up during questions. Items 3 and 4 both bit this repo on its first CI run — worth telling as war stories rather than reading out.');
+  notes(s, 'Good slide to leave up during questions. Items 3, 4 and 5 all bit this repo for real — worth telling as war stories rather than reading out. On item 2: five and eight came out at the same 141s mean, but eight failed two runs in five, and the spec that failed passes on its own in 13s. That is contention, not a bug — each atomized target is a Cypress process plus a browser, so the ceiling is well under your core count.');
 }
 
 pres.writeFile({ fileName: process.argv[2] || 'Scaling-E2E-Tests-with-Nx.pptx' }).then((f) => console.log('wrote', f));

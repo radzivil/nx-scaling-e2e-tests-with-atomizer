@@ -317,6 +317,20 @@ teams never turn them on.
 
 ## Gotchas worth mentioning
 
+- **More parallel is not more faster.** `--parallel` counts Cypress processes,
+  and each one drags a browser along, so the ceiling sits well below your core
+  count. Measured on a 10-core M1 Pro over all 30 targets:
+
+  | | Runs | Mean wall clock | Red runs |
+  | --- | --- | --- | --- |
+  | `--parallel=5` | 2 | 141s | 0 |
+  | `--parallel=8` | 5 | 141s | **2** |
+
+  Identical throughput, 40% failure rate. The spec that failed
+  (`admin-e2e settings-save.cy.ts`) passes on its own in 13s, so it is
+  contention hitting Cypress's default timeouts, not a bug. Find your own
+  ceiling before you raise the number; past it you buy variance for free.
+
 - **Atomization is not free per task.** Each atomized target boots its own
   Cypress process. All 30 specs serially through the atomizer is *slower* than
   the three un-atomized tasks — 5m 40s against 4m 20s. The win only shows up once you actually run them
