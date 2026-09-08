@@ -456,46 +456,65 @@ function bullets(s, items, opts = {}) {
   title(s, 'Change got cheap. Confidence did not.');
 
   const cols = [
-    ['Writing the change', 'minutes', 'AI writes it, reviews it, refactors it. The cost collapsed this year.', C.accent],
-    ['Trusting the change', 'unchanged', 'Still the same slow suite, still the same nightly run, still the same shrug.', C.hot],
+    ['Writing the change', 'MINUTES', 'AI writes it, reviews it, refactors it. That cost collapsed this year.', C.accent],
+    ['Trusting the change', 'AN HOUR', 'Same suite, same nightly run, same shrug. That cost did not move.', C.hot],
   ];
   cols.forEach(([h, badge, body, color], i) => {
     const x = M + i * 6.15;
     s.addShape(pres.ShapeType.roundRect, {
-      x, y: 2.1, w: 5.75, h: 2.3, rectRadius: 0.09,
-      fill: { color: C.panel }, line: { color: color, width: 1.5 },
+      x, y: 1.95, w: 5.75, h: 2.05, rectRadius: 0.09,
+      fill: { color: C.panel }, line: { color, width: 1.5 },
     });
     s.addText(h, {
-      x: x + 0.3, y: 2.35, w: 5.15, h: 0.45, isTextBox: true, margin: 0,
-      fontFace: F.body, fontSize: 20, bold: true, color: C.text,
+      x: x + 0.3, y: 2.15, w: 5.15, h: 0.4, isTextBox: true, margin: 0,
+      fontFace: F.body, fontSize: 18, bold: true, color: C.text,
     });
-    s.addText(badge.toUpperCase(), {
-      x: x + 0.3, y: 2.85, w: 5.15, h: 0.4, isTextBox: true, margin: 0,
-      fontFace: F.mono, fontSize: 22, bold: true, charSpacing: 1, color,
+    s.addText(badge, {
+      x: x + 0.3, y: 2.58, w: 5.15, h: 0.45, isTextBox: true, margin: 0,
+      fontFace: F.mono, fontSize: 24, bold: true, charSpacing: 1, color,
     });
     s.addText(body, {
-      x: x + 0.3, y: 3.35, w: 5.15, h: 0.85, isTextBox: true, margin: 0,
+      x: x + 0.3, y: 3.12, w: 5.15, h: 0.75, isTextBox: true, margin: 0,
+      fontFace: F.body, fontSize: 13, color: C.body,
+    });
+  });
+
+  s.addText('What it should cost instead', {
+    x: M, y: 4.3, w: 11.9, h: 0.4, isTextBox: true, margin: 0,
+    fontFace: F.body, fontSize: 16, bold: true, color: C.warn,
+  });
+
+  const bars = [
+    { label: 'Today — every change runs everything', mins: 60, color: C.warn },
+    { label: 'Target — an isolated change', mins: 10, color: C.accent },
+  ];
+  const maxW = 5.4;
+  bars.forEach((b, i) => {
+    const y = 4.85 + i * 0.72;
+    s.addText(b.label, {
+      x: M, y, w: 4.3, h: 0.42, isTextBox: true, margin: 0, valign: 'middle',
       fontFace: F.body, fontSize: 14, color: C.body,
+    });
+    s.addShape(pres.ShapeType.roundRect, {
+      x: M + 4.5, y: y + 0.07, w: (b.mins / 60) * maxW, h: 0.3, rectRadius: 0.04,
+      fill: { color: b.color }, line: { width: 0 },
+    });
+    s.addText(`${b.mins} min`, {
+      x: M + 4.65 + (b.mins / 60) * maxW, y, w: 1.6, h: 0.42, isTextBox: true, margin: 0, valign: 'middle',
+      fontFace: F.body, fontSize: 15, bold: true, color: b.color,
     });
   });
 
   s.addText(
-    'A quality gate you can run in a minute is worth more than one you can trust in principle.',
+    'Ten minutes is a coffee. An hour is a context switch — so the suite moves to nightly, and nightly means nobody is gating on it.',
     {
-      x: M, y: 4.85, w: W - 2 * M, h: 0.5, isTextBox: true, margin: 0,
-      fontFace: F.body, fontSize: 19, bold: true, color: C.text,
-    }
-  );
-  s.addText(
-    'When a change costs an afternoon, a twenty-minute suite is a rounding error. When it costs four minutes, the suite is the bottleneck — and the thing standing between you and merging code you did not write line by line.',
-    {
-      x: M, y: 5.45, w: W - 2 * M, h: 1.0, isTextBox: true, margin: 0,
+      x: M, y: 6.35, w: W - 2 * M, h: 0.6, isTextBox: true, margin: 0,
       fontFace: F.body, fontSize: 15, color: C.muted,
     }
   );
   notes(
     s,
-    'This is the argument for caring. Do not oversell AI — the point is only that the ratio moved. Generation is cheap, verification is not, so verification is where the leverage went.'
+    'The argument for caring, in one comparison. Do not oversell AI — the only claim is that the ratio moved: generation got cheap, verification did not, so verification is where the leverage is now. Ten minutes is not arbitrary; it is roughly what an isolated change costs once affected plus caching plus per-app runners are all doing their job, and it is what the real project landed on.'
   );
 }
 
