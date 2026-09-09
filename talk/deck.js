@@ -1944,4 +1944,82 @@ const DEMO = {
   notes(s, 'Good slide to leave up during questions. Items 3, 4 and 5 all bit this repo for real — worth telling as war stories rather than reading out. On item 2: on this laptop five and eight came out at the same 141s mean, but eight failed two runs in five, and the spec that failed passes on its own in 13s. On an 18-core M5 the opposite happened — 18 beat 9 by 29% and stayed green. Memory was not the constraint on either machine. The real limit here is the 8 performance cores, and a Cypress target wants about 1.5 of them, which puts the ceiling near 5. Divide performance cores by what a task costs, then measure.');
 }
 
+/* ── 26 appendix · playwright ─────────────────────────────────────────── */
+{
+  const s = lightSlide();
+  kicker(s, 'Appendix · The question that always comes', 'B45309');
+  title(s, 'What about Playwright?', '10131A');
+
+  const cols = [
+    {
+      x: M,
+      head: 'Carries over unchanged',
+      tone: '0B7A44',
+      wash: 'F1FAF5',
+      items: [
+        '@nx/playwright has the same atomizer — one target per spec file',
+        'Same names: e2e-ci--src/e2e/checkout.spec.ts',
+        'Same Nx Cloud gate on the e2e-ci wrapper',
+        'run-e2e.mjs needs no changes — it only reads the graph',
+      ],
+    },
+    {
+      x: M + 6.15,
+      head: 'What changes',
+      tone: 'B45309',
+      wash: 'FFF7E6',
+      items: [
+        'Playwright already runs spec files across worker processes. Cypress does not — that gap is most of the win here',
+        'Atomizing swaps that warm pool for one cold browser launch per target',
+        'Playwright ships native --shard, so rung 4 needs no Nx either',
+      ],
+    },
+  ];
+
+  cols.forEach((c) => {
+    s.addShape(pres.ShapeType.roundRect, {
+      x: c.x, y: 2.0, w: 5.85, h: 3.5, rectRadius: 0.08,
+      fill: { color: c.wash }, line: { color: c.tone, width: 1 },
+    });
+    s.addText(c.head, {
+      x: c.x + 0.3, y: 2.2, w: 5.25, h: 0.35, isTextBox: true, margin: 0,
+      fontFace: F.body, fontSize: 16, bold: true, color: c.tone,
+    });
+    c.items.forEach((t, i) => {
+      const y = 2.68 + i * 0.68;
+      s.addShape(pres.ShapeType.ellipse, {
+        x: c.x + 0.32, y: y + 0.055, w: 0.09, h: 0.09,
+        fill: { color: c.tone }, line: { width: 0 },
+      });
+      s.addText(t, {
+        x: c.x + 0.58, y, w: 4.95, h: 0.62, isTextBox: true, margin: 0,
+        valign: 'top',
+        fontFace: F.body, fontSize: 12, color: '10131A',
+      });
+    });
+  });
+
+  s.addShape(pres.ShapeType.roundRect, {
+    x: M, y: 5.7, w: W - 2 * M, h: 1.2, rectRadius: 0.07,
+    fill: { color: 'FFFFFF' }, line: { color: 'E2E6ED', width: 1 },
+  });
+  s.addText(
+    [
+      { text: 'The short answer — ', options: { bold: true, color: '10131A' } },
+      { text: 'on Cypress the atomizer buys you parallelism and caching. On Playwright it mostly buys caching, because the parallelism was already there.', options: { breakLine: true, color: '10131A' } },
+      { text: 'Still worth it: the cache and failure-only retries have no Playwright equivalent, and affected does not care which runner you use. Measure before you trade away the worker pool.', options: { color: '5C6675' } },
+    ],
+    {
+      x: M + 0.3, y: 5.85, w: W - 2 * M - 0.6, h: 0.95, isTextBox: true, margin: 0,
+      valign: 'top',
+      fontFace: F.body, fontSize: 13, lineSpacingMultiple: 1.15,
+    }
+  );
+  notes(
+    s,
+    'Checked against @nx/playwright 23.2.0 rather than from memory: the plugin builds target names as `${ciTargetName}--${relativeSpecFilePath}` and sets the same nonAtomizedTarget marker, which is what triggers the Nx Cloud refusal. One extra detail if someone digs: Playwright\'s plugin also emits an e2e-ci--wait-for-webserver target, because it coordinates the shared dev server across atomized runs differently from Cypress. If the questioner owns a Playwright suite, the honest advice is to take section 05 and skip section 04.'
+  );
+}
+
+
 pres.writeFile({ fileName: process.argv[2] || 'Scaling-E2E-Tests-with-Nx.pptx' }).then((f) => console.log('wrote', f));

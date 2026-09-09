@@ -441,6 +441,41 @@ teams never turn them on.
   until you run it. Commit the result.
 - **`nx reset`** clears the local cache when you want to demo a cold run.
 
+## What about Playwright?
+
+Everything here works with `@nx/playwright` — checked against 23.2.0 rather than
+assumed. The plugin builds target names the same way
+(`${ciTargetName}--${relativeSpecFilePath}`) and sets the same
+`nonAtomizedTarget` marker, which is what triggers the Nx Cloud refusal. So
+`tools/run-e2e.mjs` works untouched: it only ever asks the project graph for
+targets starting with `e2e-ci--`.
+
+**But the trade is different, and mostly worse.** Cypress runs spec files
+serially in one process — that gap is where most of the win in this repo comes
+from. Playwright already runs them across worker processes. Atomizing a
+Playwright suite swaps that warm pool for one cold browser launch per target,
+which is the per-task startup tax from the gotchas, paid to buy something you
+already had. Playwright also ships native `--shard=i/n`, so distribution does
+not need Nx either.
+
+What you still gain is real:
+
+| | Cypress | Playwright |
+| --- | --- | --- |
+| Parallelism across spec files | atomizer gives it to you | already there |
+| Distribution across machines | atomizer + a matrix | native `--shard` |
+| **Cache and failure-only retries** | **atomizer** | **atomizer** — no equivalent otherwise |
+| **`affected`** | **the graph** | **the graph** — runner-agnostic |
+
+So: on Cypress the atomizer buys parallelism *and* caching; on Playwright it
+mostly buys caching. Still worth it — a retry that skips everything that already
+passed has no Playwright equivalent — but measure before trading away the worker
+pool.
+
+One implementation detail if you go looking: Playwright's plugin also emits an
+`e2e-ci--wait-for-webserver` target that Cypress's does not, because it
+coordinates the shared dev server across atomized runs differently.
+
 ## Layout
 
 ```

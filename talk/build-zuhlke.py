@@ -838,6 +838,46 @@ def build(prs):
 
 
 
+    # 26 appendix · playwright ------------------------------------------------
+    s = add(prs, "Only title")
+    heading(s, "Appendix · The question that always comes", "What about Playwright?",
+            kicker_color=ORANGE)
+    for x, head, tone, wash, items in [
+        (M, "Carries over unchanged", GREEN_DEEP, GREEN_25, [
+            "@nx/playwright has the same atomizer — one target per spec file",
+            "Same names: e2e-ci--src/e2e/checkout.spec.ts",
+            "Same Nx Cloud gate on the e2e-ci wrapper",
+            "run-e2e.mjs needs no changes — it only reads the graph",
+        ]),
+        (M + 6.15, "What changes", ORANGE_DEEP, ORANGE_25, [
+            "Playwright already runs spec files across worker processes. Cypress does not — "
+            "that gap is most of the win here",
+            "Atomizing swaps that warm pool for one cold browser launch per target",
+            "Playwright ships native --shard, so rung 4 needs no Nx either",
+        ]),
+    ]:
+        rect(s, x, CONTENT_TOP + 0.1, 5.85, 3.35, fill=wash, outline=tone)
+        write(textbox(s, x + 0.3, CONTENT_TOP + 0.28, 5.25, 0.35), head, size=15, font=HEAD, color=tone)
+        for i, t in enumerate(items):
+            y = CONTENT_TOP + 0.78 + i * 0.64
+            ellipse(s, x + 0.32, y + 0.06, 0.09, fill=tone)
+            write(textbox(s, x + 0.56, y, 4.95, 0.6), t, size=11, color=INK)
+
+    rect(s, M, 5.6, 11.97, 1.15, fill=WHITE, outline=LINE)
+    write(textbox(s, M + 0.28, 5.76, 11.4, 0.32),
+          "The short answer — on Cypress the atomizer buys parallelism and caching. On Playwright "
+          "it mostly buys caching, because the parallelism was already there.", size=12, color=INK)
+    write(textbox(s, M + 0.28, 6.12, 11.4, 0.5),
+          "Still worth it: the cache and failure-only retries have no Playwright equivalent, and "
+          "affected does not care which runner you use. Measure before you trade away the pool.",
+          size=12, color=BODY)
+    notes(s, "Checked against @nx/playwright 23.2.0, not from memory: the plugin names targets "
+             "`${ciTargetName}--${relativeSpecFilePath}` and sets the same nonAtomizedTarget marker "
+             "that triggers the Nx Cloud refusal. It also emits an extra e2e-ci--wait-for-webserver "
+             "target, because it coordinates the shared dev server differently. If the questioner "
+             "owns a Playwright suite: take section 05, skip section 04.")
+
+
 def stamp_master(path: Path, *, presenter: str, date: str):
     """Replace the template's stock footer name/date across master and layouts.
 
