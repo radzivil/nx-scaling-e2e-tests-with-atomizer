@@ -2022,4 +2022,58 @@ const DEMO = {
 }
 
 
+/* ── 27 appendix · q&a bank ───────────────────────────────────────────── */
+{
+  const s = lightSlide();
+  kicker(s, 'Appendix · Prepared answers', 'B45309');
+  title(s, 'Ten questions you will probably get', '10131A');
+
+  const qa = [
+    ['Why not just pay for Nx Cloud?',
+     'Often the right call. It adds distribution by measured duration, a shared cache and flaky detection. This is the free half of the same idea.'],
+    ['Does the cache fix flaky tests?',
+     'No. It makes retries cheap. A flake fails, is never cached, and re-runs on its own while everything else replays.'],
+    ['Can the cache hand back a wrong result?',
+     'Only if a task has inputs Nx cannot see — a live API, the clock, a shared database. Declare them as inputs or mark the task uncacheable.'],
+    ['Can the team share one cache?',
+     'Not on the free tier: it is per-machine and per-CI-job. A shared remote cache is the main thing Nx Cloud actually sells.'],
+    ['Do I need a monorepo for this?',
+     'No. The atomizer works on a single project. It is affected that needs several projects before it earns its keep.'],
+    ['One app has 200 specs, the others have 5?',
+     'That is exactly when sharding beats a per-app matrix. Shard the big one; leave the small ones a runner each.'],
+    ['Will 30 targets cost more CI minutes?',
+     'It went 48m to 25m on the real project, and a replayed job bills almost nothing. More runners does mean more concurrency — measure yours.'],
+    ['What about shared test data?',
+     'The real blocker, and it is not an Nx problem. Specs must be independent before you can run them at once. Usually more work than the config.'],
+    ['Does this work with Playwright?',
+     'Same atomizer, same gate. But Playwright already parallelises, so you mostly gain the cache. Previous slide has the detail.'],
+    ['How long did this take to set up?',
+     'The config is minutes. Reviewing a thousand tests took months. The tooling was never the hard part.'],
+  ];
+
+  qa.forEach(([q, a], i) => {
+    const col = i < 5 ? 0 : 1;
+    const row = i % 5;
+    const x = M + col * 6.15;
+    const y = 1.86 + row * 1.04;
+    s.addText(String(i + 1).padStart(2, '0'), {
+      x, y, w: 0.4, h: 0.3, isTextBox: true, margin: 0,
+      fontFace: F.mono, fontSize: 11, bold: true, color: 'B45309',
+    });
+    s.addText(q, {
+      x: x + 0.45, y, w: 5.4, h: 0.3, isTextBox: true, margin: 0, valign: 'top',
+      fontFace: F.body, fontSize: 12.5, bold: true, color: '10131A',
+    });
+    s.addText(a, {
+      x: x + 0.45, y: y + 0.31, w: 5.4, h: 0.66, isTextBox: true, margin: 0, valign: 'top',
+      fontFace: F.body, fontSize: 10.5, color: '5C6675',
+    });
+  });
+  notes(
+    s,
+    'Reference only — do not present this, it is for you when a question lands. Numbers 1, 4 and 9 are the ones that actually come up. On 1: do not be defensive, Nx Cloud is a good product and the talk only claims the free tier is unclaimed. On 8: this is the honest answer that separates people who have done it from people who have read about it — parallel-safe test data is the real project, the Nx config is an afternoon.'
+  );
+}
+
+
 pres.writeFile({ fileName: process.argv[2] || 'Scaling-E2E-Tests-with-Nx.pptx' }).then((f) => console.log('wrote', f));

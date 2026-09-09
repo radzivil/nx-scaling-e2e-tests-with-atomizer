@@ -878,6 +878,55 @@ def build(prs):
              "owns a Playwright suite: take section 05, skip section 04.")
 
 
+    # 27 appendix · q&a bank ---------------------------------------------------
+    s = add(prs, "Only title")
+    heading(s, "Appendix · Prepared answers", "Ten questions you will probably get",
+            kicker_color=ORANGE)
+    qa = [
+        ("Why not just pay for Nx Cloud?",
+         "Often the right call. It adds distribution by measured duration, a shared cache and "
+         "flaky detection. This is the free half of the same idea."),
+        ("Does the cache fix flaky tests?",
+         "No. It makes retries cheap. A flake fails, is never cached, and re-runs on its own "
+         "while everything else replays."),
+        ("Can the cache hand back a wrong result?",
+         "Only if a task has inputs Nx cannot see — a live API, the clock, a shared database. "
+         "Declare them as inputs or mark the task uncacheable."),
+        ("Can the team share one cache?",
+         "Not on the free tier: it is per-machine and per-CI-job. A shared remote cache is the "
+         "main thing Nx Cloud actually sells."),
+        ("Do I need a monorepo for this?",
+         "No. The atomizer works on a single project. It is affected that needs several projects "
+         "before it earns its keep."),
+        ("One app has 200 specs, the others have 5?",
+         "That is exactly when sharding beats a per-app matrix. Shard the big one; leave the "
+         "small ones a runner each."),
+        ("Will 30 targets cost more CI minutes?",
+         "It went 48m to 25m on the real project, and a replayed job bills almost nothing. More "
+         "runners does mean more concurrency — measure yours."),
+        ("What about shared test data?",
+         "The real blocker, and it is not an Nx problem. Specs must be independent before you can "
+         "run them at once. Usually more work than the config."),
+        ("Does this work with Playwright?",
+         "Same atomizer, same gate. But Playwright already parallelises, so you mostly gain the "
+         "cache. Previous slide has the detail."),
+        ("How long did this take to set up?",
+         "The config is minutes. Reviewing a thousand tests took months. The tooling was never "
+         "the hard part."),
+    ]
+    for i, (q, a) in enumerate(qa):
+        x = M + (0 if i < 5 else 1) * 6.15
+        y = 1.72 + (i % 5) * 1.02
+        write(textbox(s, x, y, 0.4, 0.3), f"{i + 1:02d}", size=10, font=MONO, color=ORANGE_DEEP)
+        write(textbox(s, x + 0.45, y, 5.4, 0.3), q, size=12, font=HEAD, color=INK)
+        write(textbox(s, x + 0.45, y + 0.3, 5.4, 0.64), a, size=10, color=BODY)
+    notes(s, "Reference only — do not present this, it is for you when a question lands. "
+             "Numbers 1, 4 and 8 are the ones that actually come up. On 1: do not be defensive, "
+             "Nx Cloud is a good product and the talk only claims the free tier is unclaimed. "
+             "On 8: this is the answer that separates people who have done it from people who "
+             "have read about it — parallel-safe test data is the real project.")
+
+
 def stamp_master(path: Path, *, presenter: str, date: str):
     """Replace the template's stock footer name/date across master and layouts.
 
