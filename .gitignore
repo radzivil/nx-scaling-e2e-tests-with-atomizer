@@ -56,3 +56,7 @@ test-output
 talk/slide-*.jpg
 talk/z-*.jpg
 talk/*.pdf
+
+# PowerPoint lock files
+~$*
+talk/~$*

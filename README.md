@@ -18,26 +18,41 @@ worth showing: no single change invalidates everything.
 
 ## The ladder
 
-Four ways to run the same 30 spec files, measured on an M-series laptop:
+Four ways to run the same 30 spec files, measured on two laptops:
 
-| Rung | How | Wall clock |
-| --- | --- | --- |
-| 1 | Un-atomized — `nx e2e` per app, one process each | **~4m 20s** |
-| 2 | Atomized but serial — `--parallel=1` | **~5m 40s** ← *slower* |
-| 3 | Atomized, 5 at a time on one machine | **~2m 20s** |
-| 4 | One runner per app, 5 at a time on each | **~55s** |
-| — | Re-run with nothing changed | **~5s** |
+| Rung | How | M1 Pro · 10 cores | M5 · 18 cores |
+| --- | --- | --- | --- |
+| 1 | Un-atomized — `nx e2e` per app, one process each | ~4m 20s | ~3m 16s |
+| 2 | Atomized but serial — `--parallel=1` | ~5m 40s ← *slower* | ~4m 00s ← *slower* |
+| 3 | Atomized, half your cores at once | **~2m 20s** (at 5) | **~48s** (at 9) |
+| 4 | One runner per app, 5 at a time on each | **~55s** | **~55s** |
+| — | Re-run with nothing changed † | ~0.2s | ~0.2s |
+
+† Rungs 1-4 are wall clock. The replay row is Nx's own `Run duration`, because
+at that scale the wall clock is almost entirely tooling: reading the project
+graph costs ~3s before a single task is considered. Once the tests are cached,
+measure the harness.
 
 Climb only as far as you need. Rung 3 is a one-line change and buys the most;
 rung 4 needs CI to have a matrix.
 
-**Rung 2 is the slide people remember.** Splitting the suite and *not* running
-it concurrently is 31% **worse** than not splitting at all, because every spec
-now boots its own Cypress. Atomization is not a speedup — it is what makes a
-speedup possible.
+**Rung 2 is the one people remember.** Splitting the suite and *not* running it
+concurrently is worse than not splitting at all — 31% worse on the M1 Pro, 22%
+on the M5 — because every spec now boots its own Cypress. Atomization is not a
+speedup. It is what makes a speedup possible.
 
-Timings are noisy: repeats of rung 3 measured 2m 11s and 2m 32s. Quote a range
-on stage, and re-measure on the machine you will present from:
+**Rung 4 is not always a rung.** On the 18-core machine, rung 3 (48s) *beats*
+rung 4 (55s): nine local processes finish sooner than three runners capped at
+five each. Distribution only pays once one machine runs out of cores, and an
+18-core laptop has not. On the 10-core machine the ladder still climbs the way
+you would expect — 2m 20s down to 55s — because five at a time genuinely is the
+ceiling there.
+
+That is the honest version of the advice: **more cores beat more machines until
+you run out of cores.** CI still needs rung 4, because a CI runner is small.
+
+Timings are noisy: repeats of rung 3 on the M1 Pro measured 2m 11s and 2m 32s.
+Quote a range on stage, and re-measure on the machine you will present from:
 
 ```bash
 npm run e2e:benchmark
