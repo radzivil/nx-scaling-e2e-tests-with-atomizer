@@ -20,12 +20,12 @@ worth showing: no single change invalidates everything.
 
 Four ways to run the same 30 spec files, measured on two laptops:
 
-| Rung | How | M1 Pro · 10 cores | M5 · 18 cores |
+| Rung | How | M1 Pro · 10 cores · 32 GB | M5 · 18 cores · 48 GB |
 | --- | --- | --- | --- |
 | 1 | Un-atomized — `nx e2e` per app, one process each | ~4m 20s | ~3m 16s |
 | 2 | Atomized but serial — `--parallel=1` | ~5m 40s ← *slower* | ~4m 00s ← *slower* |
 | 3 | Atomized, half your cores at once | **~2m 20s** (at 5) | **~48s** (at 9) |
-| 3+ | Atomized, *all* your cores at once | slower, and flaky (at 8) | **~34s** (at 18) |
+| 3+ | Atomized, *all* your cores at once | slower, and flaky (at 8) | **~34s** (at 18, green) |
 | 4 | One runner per app, 5 at a time on each | **~55s** | **~55s** |
 | — | Re-run with nothing changed † | ~0.2s | ~0.2s |
 
@@ -361,16 +361,19 @@ teams never turn them on.
   (`admin-e2e settings-save.cy.ts`) passes on its own in 13s, so it is
   contention hitting Cypress's default timeouts, not a bug.
 
-  **But that ceiling is not universal.** On the 18-core M5, pushing all the way
-  to `--parallel=18` took the same 30 targets to **34s**, against 48s at 9 — a
-  29% gain where the same move on the M1 Pro cost speed *and* reliability. Half
-  your cores is a safe default, not an optimal one. On a big machine it may be
-  leaving a third on the table; on a small one, going past it buys flakes.
-  Measure both directions before you settle.
+  **But that ceiling is not universal.** On the 18-core M5, `--parallel=18` took
+  the same 30 targets to **34s** and stayed green, against 48s at 9 — a 29% gain
+  where the same move on the M1 Pro cost speed *and* reliability. Half your
+  cores is a safe default, not an optimal one: on a big machine it leaves nearly
+  a third on the table, on a small one going past it buys flakes.
 
-  Watch memory too: each Cypress plus browser is 0.5-1 GB, so a high-core
-  laptop can hit swap before it runs out of cores, and swapping looks exactly
-  like contention.
+  **Memory was not the constraint on either machine** — 8 concurrent needs about
+  8 GB of the M1's 32, and 18 needs about 18 GB of the M5's 48. The M1's limit is
+  its **8 performance cores** (the other two are efficiency cores), and a Cypress
+  target wants roughly 1.5 of them, which lands the ceiling near 5. That is the
+  useful model: divide *performance* cores by what one task actually costs.
+  Memory only becomes the binding constraint on a 16 GB machine, where swapping
+  looks exactly like contention.
 
   Nx accepts `--parallel=50%` on the command line, but the same value in
   `nx.json` crashes it with `The "setMaxListeners" argument must be of type

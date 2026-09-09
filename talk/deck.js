@@ -1941,7 +1941,7 @@ const DEMO = {
       color: '55607A',
     });
   });
-  notes(s, 'Good slide to leave up during questions. Items 3, 4 and 5 all bit this repo for real — worth telling as war stories rather than reading out. On item 2: five and eight came out at the same 141s mean, but eight failed two runs in five, and the spec that failed passes on its own in 13s. That is contention, not a bug — each atomized target is a Cypress process plus a browser, so the ceiling is well under your core count.');
+  notes(s, 'Good slide to leave up during questions. Items 3, 4 and 5 all bit this repo for real — worth telling as war stories rather than reading out. On item 2: on this laptop five and eight came out at the same 141s mean, but eight failed two runs in five, and the spec that failed passes on its own in 13s. On an 18-core M5 the opposite happened — 18 beat 9 by 29% and stayed green. Memory was not the constraint on either machine. The real limit here is the 8 performance cores, and a Cypress target wants about 1.5 of them, which puts the ceiling near 5. Divide performance cores by what a task costs, then measure.');
 }
 
 pres.writeFile({ fileName: process.argv[2] || 'Scaling-E2E-Tests-with-Nx.pptx' }).then((f) => console.log('wrote', f));

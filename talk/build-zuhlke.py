@@ -834,7 +834,7 @@ def build(prs):
               str(i + 1), size=11, font=HEAD, color=INK)
         write(textbox(s, M + 0.45, y, 4.6, 0.4), h, size=13, font=HEAD, color=INK)
         write(textbox(s, M + 5.3, y, 7.3, 0.5), b, size=12, color=BODY)
-    notes(s, "Leave this up during questions — it is the slide people photograph. On item 2: five and eight came out at the same 141s mean, but eight failed two runs in five, and the spec that failed passes alone in 13s. Contention, not a bug.")
+    notes(s, "Leave this up during questions — it is the slide people photograph. On item 2: on this laptop five and eight tied at 141s but eight went red twice in five runs, while an 18-core M5 reached 34s at 18 and stayed green. Not memory — 8 concurrent needs 8 GB of this machine's 32. The limit here is the 8 performance cores, and a Cypress target wants about 1.5 of them, which puts the ceiling near 5.")
 
 
 
