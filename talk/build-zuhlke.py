@@ -671,17 +671,43 @@ def build(prs):
     # 19 the ladder ----------------------------------------------------------
     s = add(prs, "Only title")
     heading(s, "Section 06 · The numbers", "Climb only as far as you need")
-    bars(s, M, CONTENT_TOP + 0.1, [
-        ("1 · Un-atomized, one process per app", 260, ORANGE),
-        ("2 · Atomized, but still serial", 340, ORANGE_DEEP),
-        ("3 · Atomized, 5 at a time, one machine", 140, GREEN),
-        ("4 · One runner per app", 55, GREEN),
-        ("— · Re-run, nothing changed", 5, GREEN),
-    ], label_w=4.4, bar_w=5.4, gap=0.78)
-    rect(s, M, 5.95, 11.97, 0.85, fill=ORANGE_25, outline=ORANGE)
-    write(textbox(s, M + 0.28, 6.15, 11.4, 0.5),
-          "Rung 2 is the honest one: at 30 specs, atomizing without parallelism is 31% slower than "
-          "not atomizing at all.", size=12, color=INK)
+    # Bars are the laptop the live demo runs on; the M5 column is for contrast.
+    rungs = [
+        ("1 · Un-atomized, one process per app", 260, 196, ORANGE),
+        ("2 · Atomized, but still serial", 340, 240, ORANGE_DEEP),
+        ("3 · Atomized, half your cores at once", 140, 48, GREEN),
+        ("4 · One runner per app", 55, 55, GREEN),
+        ("— · Re-run, nothing changed", 5, 5, GREEN),
+    ]
+    bar_x, bar_w, m5_x = M + 4.3, 4.3, 10.9
+
+    def clock(v):
+        return f"{v // 60}m {v % 60:02d}s" if v >= 60 else f"{v}s"
+
+    write(textbox(s, bar_x, CONTENT_TOP - 0.02, 4.6, 0.28),
+          "M1 PRO · 10 CORES · LIVE DEMO", size=10, font=HEAD, color=GREEN_DEEP)
+    write(textbox(s, m5_x, CONTENT_TOP - 0.02, 2.0, 0.28),
+          "M5 · 18 CORES", size=10, font=HEAD, color=MUTED)
+    rect(s, m5_x - 0.3, CONTENT_TOP - 0.06, 0.012, 4.0, fill=LINE, radius=False)
+
+    for i, (label, v, m5, colour) in enumerate(rungs):
+        y = CONTENT_TOP + 0.42 + i * 0.72
+        write(textbox(s, M, y, 4.1, 0.4, anchor=MSO_ANCHOR.MIDDLE), label, size=12, color=BODY)
+        w = max(0.06, (v / 340) * bar_w)
+        rect(s, bar_x, y + 0.06, w, 0.28, fill=colour, radius=False)
+        write(textbox(s, bar_x + 0.12 + w, y, 1.4, 0.4, anchor=MSO_ANCHOR.MIDDLE),
+              clock(v), size=12, font=HEAD, color=INK)
+        write(textbox(s, m5_x, y, 1.6, 0.4, anchor=MSO_ANCHOR.MIDDLE),
+              clock(m5), size=12, font=HEAD if i == 2 else TEXT,
+              color=GREEN_DEEP if i == 2 else BODY)
+
+    rect(s, M, 6.0, 11.97, 0.92, fill=ORANGE_25, outline=ORANGE)
+    write(textbox(s, M + 0.28, 6.16, 11.4, 0.32),
+          "Rung 2 is the honest one — atomizing without parallelism is slower than not atomizing "
+          "at all. On both machines.", size=12, color=INK)
+    write(textbox(s, M + 0.28, 6.5, 11.4, 0.32),
+          "Rung 4 is not always a rung — on 18 cores, nine local processes beat three runners.",
+          size=12, color=INK)
     notes(s, "Headline is 4m20s to 55s, but do not skip rung 2. Rung 3 is one flag and gets most "
              "of the win.\n\nDO NOT RUN LIVE\n  $ npm run e2e:benchmark   (~15 minutes)")
 

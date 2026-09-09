@@ -1510,92 +1510,81 @@ const DEMO = {
   kicker(s, 'Section 06 · The numbers', '0B7A44');
   title(s, 'Climb only as far as you need', '10131A');
 
+  // Bars are the machine the live demo runs on, so what the room sees matches
+  // what they just watched. The M5 column is there for contrast — and because
+  // rung 4 inverts on it.
   const bars = [
-    { rung: '1', label: 'Un-atomized, one process per app', v: 260, color: 'F5A524' },
-    { rung: '2', label: 'Atomized, but still serial', v: 340, color: 'C2410C' },
-    { rung: '3', label: 'Atomized, 5 at a time, one machine', v: 140, color: '0B7A44' },
-    { rung: '4', label: 'One runner per app, 5 at a time each', v: 55, color: '0B7A44' },
-    { rung: '—', label: 'Re-run, nothing changed', v: 5, color: '15803D' },
+    { rung: '1', label: 'Un-atomized, one process per app', v: 260, m5: 196, color: 'F5A524' },
+    { rung: '2', label: 'Atomized, but still serial', v: 340, m5: 240, color: 'C2410C' },
+    { rung: '3', label: 'Atomized, half your cores at once', v: 140, m5: 48, color: '0B7A44' },
+    { rung: '4', label: 'One runner per app, 5 at a time each', v: 55, m5: 55, color: '0B7A44' },
+    { rung: '—', label: 'Re-run, nothing changed', v: 5, m5: 5, color: '15803D' },
   ];
-  const maxW = 6.9;
+  const maxW = 4.5;
+  const barX = M + 4.35;
+  const m5X = 11.05;
+
+  const clock = (v) =>
+    Math.floor(v / 60) ? `${Math.floor(v / 60)}m ${String(v % 60).padStart(2, '0')}s` : `${v}s`;
+
+  s.addText('M1 PRO · 10 CORES · LIVE DEMO', {
+    x: barX, y: 1.78, w: 5.0, h: 0.3, isTextBox: true, margin: 0,
+    fontFace: F.body, fontSize: 11, bold: true, charSpacing: 1, color: '0B7A44',
+  });
+  s.addText('M5 · 18 CORES', {
+    x: m5X, y: 1.78, w: 1.8, h: 0.3, isTextBox: true, margin: 0,
+    fontFace: F.body, fontSize: 11, bold: true, charSpacing: 1, color: '8A94A6',
+  });
+  s.addShape(pres.ShapeType.rect, {
+    x: m5X - 0.3, y: 1.72, w: 0.012, h: 4.25,
+    fill: { color: 'E2E6ED' }, line: { width: 0 },
+  });
+
   bars.forEach((b, i) => {
-    const y = 2.1 + i * 0.82;
+    const y = 2.2 + i * 0.78;
     s.addText(b.rung, {
-      x: M,
-      y,
-      w: 0.4,
-      h: 0.4,
-      isTextBox: true,
-      margin: 0,
-      valign: 'middle',
-      fontFace: F.mono,
-      fontSize: 15,
-      bold: true,
-      color: '8A94A6',
+      x: M, y, w: 0.4, h: 0.4, isTextBox: true, margin: 0, valign: 'middle',
+      fontFace: F.mono, fontSize: 15, bold: true, color: '8A94A6',
     });
     s.addText(b.label, {
-      x: M + 0.45,
-      y,
-      w: 4.0,
-      h: 0.4,
-      isTextBox: true,
-      margin: 0,
-      valign: 'middle',
-      fontFace: F.body,
-      fontSize: 13,
-      color: '10131A',
+      x: M + 0.45, y, w: 3.85, h: 0.4, isTextBox: true, margin: 0, valign: 'middle',
+      fontFace: F.body, fontSize: 13, color: '10131A',
     });
+    const w = Math.max(0.08, (b.v / 340) * maxW);
     s.addShape(pres.ShapeType.roundRect, {
-      x: M + 4.5,
-      y: y + 0.07,
-      w: Math.max(0.08, (b.v / 340) * maxW),
-      h: 0.32,
-      rectRadius: 0.04,
-      fill: { color: b.color },
-      line: { color: b.color, width: 0 },
+      x: barX, y: y + 0.07, w, h: 0.32, rectRadius: 0.04,
+      fill: { color: b.color }, line: { color: b.color, width: 0 },
     });
-    const mins = Math.floor(b.v / 60);
-    s.addText(`${mins ? `${mins}m ` : ''}${b.v % 60}s`, {
-      x: M + 4.6 + Math.max(0.08, (b.v / 340) * maxW),
-      y,
-      w: 1.5,
-      h: 0.4,
-      isTextBox: true,
-      margin: 0,
-      valign: 'middle',
-      fontFace: F.body,
-      fontSize: 14,
-      bold: true,
-      color: '10131A',
+    s.addText(clock(b.v), {
+      x: barX + 0.1 + w, y, w: 1.4, h: 0.4, isTextBox: true, margin: 0, valign: 'middle',
+      fontFace: F.body, fontSize: 14, bold: true, color: '10131A',
+    });
+    s.addText(clock(b.m5), {
+      x: m5X, y, w: 1.5, h: 0.4, isTextBox: true, margin: 0, valign: 'middle',
+      fontFace: F.body, fontSize: 14, color: i === 2 ? '0B7A44' : '5C6675',
+      bold: i === 2,
     });
   });
 
   s.addShape(pres.ShapeType.roundRect, {
-    x: M,
-    y: 6.3,
-    w: W - 2 * M,
-    h: 0.75,
-    rectRadius: 0.07,
-    fill: { color: 'FFF7E6' },
-    line: { color: 'F5A524', width: 1 },
+    x: M, y: 6.15, w: W - 2 * M, h: 1.0, rectRadius: 0.07,
+    fill: { color: 'FFF7E6' }, line: { color: 'F5A524', width: 1 },
   });
   s.addText(
-    'Rung 2 is still the honest one: at 30 specs, atomizing without parallelism is 31% slower than not atomizing at all.',
+    [
+      { text: 'Rung 2 is the honest one — ', options: { bold: true, color: '5B4308' } },
+      { text: 'atomizing without parallelism is slower than not atomizing at all. On both machines.', options: { breakLine: true, color: '5B4308' } },
+      { text: 'Rung 4 is not always a rung — ', options: { bold: true, color: '5B4308' } },
+      { text: 'on 18 cores, nine local processes beat three runners. Distribution pays once one machine runs out of cores.', options: { color: '5B4308' } },
+    ],
     {
-      x: M + 0.3,
-      y: 6.47,
-      w: W - 2 * M - 0.6,
-      h: 0.45,
-      isTextBox: true,
-      margin: 0,
-      fontFace: F.body,
-      fontSize: 14,
-      color: '5B4308',
+      x: M + 0.3, y: 6.3, w: W - 2 * M - 0.6, h: 0.75, isTextBox: true, margin: 0,
+      fontFace: F.body, fontSize: 13, lineSpacingMultiple: 1.15,
     }
   );
   notes(
     s,
-    'The headline is 4m20s to 55s, but do not skip rung 2. Rung 3 is one flag and gets most of the win; rung 4 needs CI to have a matrix. Tell them to climb only as far as their pain justifies. Re-measure with npm run e2e:benchmark before the talk — rung 3 varied between 2m11s and 2m32s on repeats.' + DEMO.benchmark
+    'The bars are this laptop — the same machine they just watched the demo on — so the numbers match what they saw. The right column is an 18-core M5 for contrast. Two things to land. One: rung 2 is slower than not splitting on both machines, 31% here and 22% there, so the startup tax is real and not a quirk of old hardware. Two: on the M5 rung 3 beats rung 4, 48s against 55s. More cores beat more machines until you run out of cores — which is why CI still needs rung 4, because a CI runner is small.' + DEMO.benchmark
   );
 }
 
