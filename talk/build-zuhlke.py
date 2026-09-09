@@ -300,9 +300,7 @@ def build(prs):
     picture(s, ASSETS / "qr-linkedin.png", qr_x + 0.08, 0.93, tile - 0.16, tile - 0.16)
     write(textbox(s, qr_x, 2.52, 3.0, 0.3), "Connect on LinkedIn", size=11, color=WHITE)
 
-    notes(s, "Thirty seconds on who you are, then move.\n\nBEFORE YOU PRESENT\n"
-             "  $ npm ci && npx cypress install\n  $ npm run demo:status   -> buggyDiscount: false\n"
-             "  $ npx nx reset")
+    notes(s, "Thirty seconds on who you are, then move. Every command this talk runs is in demo.md at the repo root, in slide order — keep it open on a second screen.")
 
     # 02 why this topic ------------------------------------------------------
     s = add(prs, "Only title")
@@ -435,8 +433,7 @@ def build(prs):
     write(textbox(s, M, 6.45, 11.9, 0.4),
           "Thirty files, but only three things you can actually run — one e2e task per app.",
           size=12, color=MUTED)
-    notes(s, "Orientation, not content. Point at the uneven lib sharing — it is what makes the "
-             "affected demo land later.\n\nDEMO\n  $ npx nx graph")
+    notes(s, "Orientation, not content. Point at the uneven lib sharing — it is what makes the affected demo land later.")
 
     # 09 the baseline --------------------------------------------------------
     s = add(prs, "Only title")
@@ -459,8 +456,7 @@ def build(prs):
     write(textbox(s, M, 5.2, 11.9, 0.6),
           "And this is the small version. Fifteen apps and 1,500 tests is the project this came "
           "from — same shape, different number.", size=12, color=BODY)
-    notes(s, "Run it live if the timing works.\n\nDEMO\n  $ npx nx e2e shop-e2e   (~1m 33s, one app)\n"
-             "  All three serially is 4m 20s — quote it, do not run it.")
+    notes(s, "Run it live if the timing works.")
 
     # 10 the wish list -------------------------------------------------------
     s = add(prs, "Only title")
@@ -499,8 +495,7 @@ def build(prs):
     write(textbox(s, M, 5.1, 4.9, 1.4),
           "Nx globs the spec files and generates one cacheable target per file. Nobody maintains "
           "this list.", size=12, color=BODY)
-    notes(s, "Stress 'generated'. That is the difference from hand-rolled spec sharding.\n\n"
-             "DEMO\n  $ npm run e2e:targets   (30 targets across 3 projects)")
+    notes(s, "Stress 'generated'. That is the difference from hand-rolled spec sharding.")
 
     # 12 turning it on -------------------------------------------------------
     s = add(prs, "Only title")
@@ -524,8 +519,7 @@ def build(prs):
     ], size=12)
     write(textbox(s, 6.9, 5.4, 5.75, 0.5),
           "One target per file path — not spec1, spec2, spec3.", size=12, color=MUTED)
-    notes(s, "DEMO\n  $ npx nx show project shop-e2e --json\n"
-             '  $ grep -A8 "cypress/plugin" nx.json\n  Nine lines of config, thirty targets.')
+    notes(s, "Commands for this slide are in demo.md at the repo root.")
 
     # 13 the catch -----------------------------------------------------------
     s = add(prs, "Only title")
@@ -545,9 +539,7 @@ def build(prs):
         "Is it approved in your organisation?",
         ("If not approved — you are blocked", {"color": ORANGE_DEEP, "bold": True}),
     ], size=13, gap=0.45)
-    notes(s, "Sit on the third bullet — for much of the room this is a purchase order, not a technical problem. The good news is the next slide.\n\nDEMO\n"
-             "  $ npx nx run-many -t e2e-ci --parallel=5        (fails)\n"
-             '  $ npx nx run "shop-e2e:e2e-ci--src/e2e/catalog.cy.ts"   (~25s cold, green)')
+    notes(s, "Sit on the third bullet — for much of the room this is a purchase order, not a technical problem. The good news is the next slide.")
 
     # 14 parallel locally ----------------------------------------------------
     s = add(prs, "Only title")
@@ -571,8 +563,7 @@ def build(prs):
           "Atomize and run them serially and you get 5m 40s — 31% SLOWER than not splitting at all, "
           "because every spec now boots its own Cypress. Splitting is not a speedup. It is the "
           "precondition for one.", size=12, color=INK)
-    notes(s, "The script does two things: ask Nx for the list, hand it to run-many.\n\nDEMO\n"
-             "  $ npx nx reset\n  $ node tools/run-e2e.mjs --project=shop-e2e --parallel=5   (~40-46s)")
+    notes(s, "The script does two things: ask Nx for the list, hand it to run-many.")
 
     # 15 parallel on CI ------------------------------------------------------
     s = add(prs, "Only title")
@@ -599,8 +590,7 @@ def build(prs):
         ("run-many is a cross product", "shop and admin both have login.cy.ts. A cross-app shard runs the wrong one."),
     ]):
         card(s, M + i * 4.05, 4.95, 3.75, 1.5, h, b, title_size=13, body_size=11)
-    notes(s, "Sharding by index is what people expect — say why it is the wrong default here.\n\n"
-             "DEMO\n  $ gh run list --limit 5\n  $ gh run view --web")
+    notes(s, "Sharding by index is what people expect — say why it is the wrong default here.")
 
     # 16 CI, for real ---------------------------------------------------------
     s = add(prs, "Only title")
@@ -639,8 +629,7 @@ def build(prs):
     stat(s, M, 5.3, 3.75, "134ms", "instead of 41 seconds", color=GREEN)
     stat(s, M + 4.05, 5.3, 3.75, "11/12", "tasks replayed", color=GREEN)
     stat(s, M + 8.1, 5.3, 3.75, "0", "Cypress processes started", color=INK)
-    notes(s, "Hit up-arrow and enter. It returns before you finish the sentence.\n\nDEMO\n"
-             "  $ node tools/run-e2e.mjs --project=shop-e2e --parallel=5")
+    notes(s, "Hit up-arrow and enter. It returns before you finish the sentence.")
 
     # 17 rerun only failures -------------------------------------------------
     s = add(prs, "Only title")
@@ -660,9 +649,7 @@ def build(prs):
     stat(s, M, 5.4, 3.75, "39s", "First run, 2 specs fail", color=ORANGE)
     stat(s, M + 4.05, 5.4, 3.75, "28s", "Retry: 9 of 10 replayed", color=GREEN)
     stat(s, M + 8.1, 5.4, 3.75, "2", "Specs that actually ran", color=INK)
-    notes(s, "Be honest about 39→28: the two seeded failures are the slowest specs and each still "
-             "boots Cypress. The saving scales with how many pass.\n\nDEMO\n"
-             "  $ npm run demo:break\n  $ node tools/run-e2e.mjs --project=shop-e2e --parallel=5   (x2)")
+    notes(s, "Be honest about 39→28: the two seeded failures are the slowest specs and each still boots Cypress. The saving scales with how many pass.")
 
     # 18 content addressed ---------------------------------------------------
     s = add(prs, "Only title")
@@ -686,8 +673,7 @@ def build(prs):
           "The key is built from inputs, not from the commit. A commit that touched only this deck "
           "restored the previous commit's cache: 33/36 hits, 119ms, and the CI job went from "
           "3m 44s to 35s.", size=12, color=INK)
-    notes(s, "Best real example from this repo — nobody planned it.\n\nDEMO\n"
-             "  $ npm run demo:fix\n  $ node tools/run-e2e.mjs --project=shop-e2e --parallel=5   (~206ms)")
+    notes(s, "Best real example from this repo — nobody planned it.")
 
     # 19 the ladder ----------------------------------------------------------
     s = add(prs, "Only title")
@@ -732,8 +718,7 @@ def build(prs):
     write(textbox(s, M + 0.28, 6.62, 11.4, 0.3),
           "And the ceiling moves — the M5 at all 18 cores reached 34s, while the M1 got slower "
           "past 5. Measure your own.", size=11, color=INK)
-    notes(s, "Headline is 4m20s to 55s, but do not skip rung 2. Rung 3 is one flag and gets most "
-             "of the win.\n\nDO NOT RUN LIVE\n  $ npm run e2e:benchmark   (~15 minutes)")
+    notes(s, "Headline is 4m20s to 55s, but do not skip rung 2. Rung 3 is one flag and gets most of the win.")
 
     # 20 affected ------------------------------------------------------------
     s = add(prs, "Only title")
@@ -755,11 +740,7 @@ def build(prs):
     write(textbox(s, M, 5.9, 11.9, 0.5),
           "This is the argument for keeping e2e in the monorepo: the graph already knows which apps "
           "a shared component can break.", size=13, color=BODY)
-    notes(s, "Run it live — clean tree exits instantly, then touch libs/ui.\n\nDEMO\n"
-             "  $ npm run e2e:affected\n"
-             '  $ echo "/* demo */" >> libs/ui/src/styles.css\n'
-             "  $ node tools/e2e-targets.mjs --affected --projects-json\n"
-             "  $ git checkout -- libs/ui/src/styles.css")
+    notes(s, "Run it live — clean tree exits instantly, then touch libs/ui.")
 
     # 21 the real project ----------------------------------------------------
     s = add(prs, "Only title")

@@ -59,6 +59,12 @@ Quote a range on stage, and re-measure on the machine you will present from:
 npm run e2e:benchmark
 ```
 
+## Running the demo
+
+Every command the talk runs, in slide order, is in **[demo.md](demo.md)** —
+copy from there rather than retyping. The steps below explain *why* each one
+matters; `demo.md` is the run sheet.
+
 ## Setup
 
 ```bash

@@ -58,6 +58,12 @@ projector if you skip them:
    left empty render a pink dashed "not generated" box rather than a QR that
    silently points nowhere.
 
+## Demo commands
+
+The speaker notes carry the framing for each slide, not the commands — those
+live in [`../demo.md`](../demo.md) in slide order, so you can copy them into a
+terminal instead of reading them off the presenter screen.
+
 ## Builds
 
 The three audience questions in section 01 are three separate slides that

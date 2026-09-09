@@ -255,99 +255,6 @@ function bullets(s, items, opts = {}) {
   );
 }
 
-/**
- * Exact commands to run while a given slide is up. Kept here rather than in a
- * separate runbook so the deck and the demo cannot drift apart. Appended to the
- * speaker notes, so they are on the presenter screen, not on the projector.
- */
-const DEMO = {
-  prep:
-    '\n\nBEFORE YOU PRESENT\n' +
-    '  $ cd ~/IdeaProjects/nx-scaling-e2e-tests-with-atomizer\n' +
-    '  $ npm ci && npx cypress install\n' +
-    '  $ npm run demo:status      → expect buggyDiscount: false\n' +
-    '  $ npx nx reset             → cold cache, so the first number is honest\n' +
-    '  Keep a terminal in the repo root on a second screen or a split.',
-
-  graph:
-    '\n\nDEMO — show the real graph\n' +
-    '  $ npx nx graph\n' +
-    '  Opens a browser. Click shop, then ui, to show what depends on what.\n' +
-    '  Ctrl+C when done. `npx nx graph --print` if the projector hates the browser.',
-
-  baseline:
-    '\n\nDEMO — the un-atomized baseline\n' +
-    '  $ npx nx e2e shop-e2e\n' +
-    '  ~1m 33s for ONE app. Start it, keep talking, come back to it.\n' +
-    '  All three serially is 4m 20s — quote that, do not run it.',
-
-  targets:
-    '\n\nDEMO — what the atomizer generated\n' +
-    '  $ npm run e2e:targets\n' +
-    '  30 targets across 3 projects. Point out the names are file paths.',
-
-  inspect:
-    '\n\nDEMO — where the targets come from\n' +
-    '  $ npx nx show project shop-e2e --json\n' +
-    '  (wide — use `npm run e2e:targets` if the JSON does not fit the screen)\n' +
-    '  $ grep -A8 "cypress/plugin" nx.json\n' +
-    '  Nine lines of config generate all thirty targets.',
-
-  gate:
-    '\n\nDEMO — hit the gate, then walk around it\n' +
-    '  $ npx nx run-many -t e2e-ci --parallel=5\n' +
-    '  Fails, listing all three e2e-ci tasks. Read it out loud.\n' +
-    '  $ npx nx run "shop-e2e:e2e-ci--src/e2e/catalog.cy.ts"\n' +
-    '  Same plugin, one leaf target, green. ~25s from cold because it builds the\n' +
-    '  app and starts preview first; a couple of seconds once those are cached.',
-
-  parallelLocal:
-    '\n\nDEMO — parallel on one machine\n' +
-    '  $ npx nx reset\n' +
-    '  $ node tools/run-e2e.mjs --project=shop-e2e --parallel=5\n' +
-    '  ~40-46s across runs, against the 1m 33s baseline from earlier.\n' +
-    '  Whole workspace if you have time: node tools/run-e2e.mjs --parallel=5  (~2m 06s)',
-
-  ci:
-    '\n\nDEMO — the same thing on CI\n' +
-    '  $ gh run list --limit 5\n' +
-    '  $ gh run view --web\n' +
-    '  One job per app, and the matrix is generated from the graph:\n' +
-    '  $ sed -n "1,40p" .github/workflows/e2e.yml',
-
-  replay:
-    '\n\nDEMO — run it again\n' +
-    '  $ node tools/run-e2e.mjs --project=shop-e2e --parallel=5\n' +
-    '  Up-arrow, enter. Back in ~0.2s with 11/12 cache hits.',
-
-  rerunFailures:
-    '\n\nDEMO — the money moment\n' +
-    '  $ npm run demo:break\n' +
-    '  $ node tools/run-e2e.mjs --project=shop-e2e --parallel=5   → ~40s, 2 fail\n' +
-    '  $ node tools/run-e2e.mjs --project=shop-e2e --parallel=5   → ~28s, 9/10 cached\n' +
-    '  Nothing changed between those two. Only the failures re-executed.',
-
-  revert:
-    '\n\nDEMO — undo it\n' +
-    '  $ npm run demo:fix\n' +
-    '  $ node tools/run-e2e.mjs --project=shop-e2e --parallel=5\n' +
-    '  ~0.2s. Reverting restored the old input hash, so the old results came back.',
-
-  benchmark:
-    '\n\nDO NOT RUN THIS LIVE\n' +
-    '  $ npm run e2e:benchmark\n' +
-    '  ~15 minutes — it runs every rung from a cold cache.\n' +
-    '  Run it the morning of the talk and read the numbers off this slide.',
-
-  affected:
-    '\n\nDEMO — let the graph choose\n' +
-    '  $ npm run e2e:affected                                    → nothing affected, instant\n' +
-    '  $ echo "/* demo */" >> libs/ui/src/styles.css\n' +
-    '  $ node tools/e2e-targets.mjs --affected --projects-json   → ["admin-e2e","docs-e2e"]\n' +
-    '  $ git checkout -- libs/ui/src/styles.css\n' +
-    '  Discovery is instant. Only run the full affected suite (~1m 22s) if you have time.',
-};
-
 /* ── 01 introduction ─────────────────────────────────────────────────── */
 {
   const s = darkSlide();
@@ -393,7 +300,7 @@ const DEMO = {
 
   notes(
     s,
-    'Thirty seconds on who you are, then move. The QR stays useful all talk — people scan it while you set up the demo. Everything in this deck was measured on the repo linked at the end; nothing needs an Nx Cloud account.' + DEMO.prep
+    'Thirty seconds on who you are, then move. The QR stays useful all talk — people scan it while you set up the demo. Everything in this deck was measured on the repo linked at the end; nothing needs an Nx Cloud account.\n\nEvery command this talk runs is in demo.md at the repo root, in slide order — keep it open on a second screen rather than reading commands off these notes.'
   );
 }
 
@@ -727,7 +634,7 @@ const DEMO = {
 
   notes(
     s,
-    'Orientation, not content — keep it under a minute. Two things to point at. One: the libs are shared unevenly, formatting by shop and admin, ui by admin and docs, which is what makes the affected demo land later. Two: thirty spec files but only three runnable tasks, because nx e2e is one Cypress process per app. That three is the number the atomizer turns into thirty. Have `nx graph` open in a tab if you would rather show the real thing.' + DEMO.graph
+    'Orientation, not content — keep it under a minute. Two things to point at. One: the libs are shared unevenly, formatting by shop and admin, ui by admin and docs, which is what makes the affected demo land later. Two: thirty spec files but only three runnable tasks, because nx e2e is one Cypress process per app. That three is the number the atomizer turns into thirty. Have `nx graph` open in a tab if you would rather show the real thing.'
   );
 }
 
@@ -777,7 +684,7 @@ const DEMO = {
   );
   notes(
     s,
-    'Run this live if the timing works, otherwise show the recording. The number to sit with is 4m20s on a toy repo with 30 specs — the audience can extrapolate to their own suite faster than you can do it for them.' + DEMO.baseline
+    'Run this live if the timing works, otherwise show the recording. The number to sit with is 4m20s on a toy repo with 30 specs — the audience can extrapolate to their own suite faster than you can do it for them.'
   );
 }
 
@@ -939,7 +846,7 @@ const DEMO = {
     ],
     { x: 8.7, y: 2.45, w: 3.9, fontSize: 15 }
   );
-  notes(s, 'Stress "generated". Nobody maintains this list — that is the difference from hand-rolled spec sharding.' + DEMO.targets);
+  notes(s, 'Stress "generated". Nobody maintains this list — that is the difference from hand-rolled spec sharding.');
 }
 
 /* ── 12 turning it on ────────────────────────────────────────────────── */
@@ -1035,7 +942,7 @@ const DEMO = {
     italic: true,
     color: '55607A',
   });
-  notes(s, 'Do this live. Piping through `npm run e2e:targets` gives a cleaner list if the JSON is too wide for the screen.' + DEMO.inspect);
+  notes(s, 'Do this live. Piping through `npm run e2e:targets` gives a cleaner list if the JSON is too wide for the screen.');
 }
 
 /* ── 13 the catch ────────────────────────────────────────────────────── */
@@ -1104,7 +1011,7 @@ const DEMO = {
   );
   notes(
     s,
-    'This is the slide that did not exist last time — Nx 23 added the guard. Do not rush to the workaround: sit on the third bullet. For a lot of the room this is not a technical problem at all, it is a purchase order they are not going to win this quarter. The good news lands on the next slide.' + DEMO.gate
+    'This is the slide that did not exist last time — Nx 23 added the guard. Do not rush to the workaround: sit on the third bullet. For a lot of the room this is not a technical problem at all, it is a purchase order they are not going to win this quarter. The good news lands on the next slide.'
   );
 }
 
@@ -1165,7 +1072,7 @@ const DEMO = {
   );
   notes(
     s,
-    'The script is twenty lines and does two things: ask Nx for the target list, hand it to run-many. Do not hand-roll a process pool — you lose the cache and the usual first attempt swallows exit codes. The amber box buys you credibility for the cache claims coming next, so do not rush it.' + DEMO.parallelLocal
+    'The script is twenty lines and does two things: ask Nx for the target list, hand it to run-many. Do not hand-roll a process pool — you lose the cache and the usual first attempt swallows exit codes. The amber box buys you credibility for the cache claims coming next, so do not rush it.'
   );
 }
 
@@ -1253,7 +1160,7 @@ const DEMO = {
   });
   notes(
     s,
-    'Sharding by index is the answer people expect, so say why it is the wrong default here and keep it for the case it is good at: one app big enough to dominate. The cross-product point is real — this repo has two login.cy.ts files and the runner refuses the selection rather than quietly running both.' + DEMO.ci
+    'Sharding by index is the answer people expect, so say why it is the wrong default here and keep it for the case it is good at: one app big enough to dominate. The cross-product point is real — this repo has two login.cy.ts files and the runner refuses the selection rather than quietly running both.'
   );
 }
 
@@ -1333,7 +1240,7 @@ const DEMO = {
     ],
     { x: 6.5, y: 4.15, w: 6.1, h: 2.9, fontSize: 15 }
   );
-  notes(s, 'Hit up-arrow and enter. The whole point is that it returns before you finish the sentence.' + DEMO.replay);
+  notes(s, 'Hit up-arrow and enter. The whole point is that it returns before you finish the sentence.');
 }
 
 /* ── 18 rerun only failures ──────────────────────────────────────────── */
@@ -1427,8 +1334,7 @@ const DEMO = {
   statCard(s, { x: M + 8.1, y: 5.15, w: 3.75, value: '2', label: 'Specs that actually ran', color: C.hot });
   notes(
     s,
-    'Be honest about 37→28: the two seeded failures are the two slowest specs and each still boots Cypress. The saving scales with how many specs pass — on 200 specs with 3 failures it is enormous.' +
-      DEMO.rerunFailures
+    'Be honest about 37→28: the two seeded failures are the two slowest specs and each still boots Cypress. The saving scales with how many specs pass — on 200 specs with 3 failures it is enormous.'
   );
 }
 
@@ -1538,7 +1444,7 @@ const DEMO = {
       color: '1D3F73',
     }
   );
-  notes(s, 'If you want the "everything re-runs" version instead, run nx reset before this step. Best real example from this repo: a commit that touched only the slide deck restored the previous commit\'s cache and reported 33/36 hits and a 119ms run — the single-machine CI job went from 3m44s to 35s without anyone planning it. Inputs, not commits.' + DEMO.revert);
+  notes(s, 'If you want the "everything re-runs" version instead, run nx reset before this step. Best real example from this repo: a commit that touched only the slide deck restored the previous commit\'s cache and reported 33/36 hits and a 119ms run — the single-machine CI job went from 3m44s to 35s without anyone planning it. Inputs, not commits.');
 }
 
 /* ── 20 the ladder ───────────────────────────────────────────────────── */
@@ -1623,7 +1529,7 @@ const DEMO = {
   );
   notes(
     s,
-    'The bars are this laptop — the same machine they just watched the demo on — so the numbers match what they saw. The right column is an 18-core M5 for contrast. Two things to land. One: rung 2 is slower than not splitting on both machines, 31% here and 22% there, so the startup tax is real and not a quirk of old hardware. Two: on the M5 rung 3 beats rung 4, 48s against 55s. More cores beat more machines until you run out of cores — which is why CI still needs rung 4, because a CI runner is small.' + DEMO.benchmark
+    'The bars are this laptop — the same machine they just watched the demo on — so the numbers match what they saw. The right column is an 18-core M5 for contrast. Two things to land. One: rung 2 is slower than not splitting on both machines, 31% here and 22% there, so the startup tax is real and not a quirk of old hardware. Two: on the M5 rung 3 beats rung 4, 48s against 55s. More cores beat more machines until you run out of cores — which is why CI still needs rung 4, because a CI runner is small.'
   );
 }
 
@@ -1733,7 +1639,7 @@ const DEMO = {
   );
   notes(
     s,
-    'Run this live: npm run e2e:affected on a clean tree exits green instantly, then touch libs/ui and watch two apps light up. The last row is the one that lands — most CI runs on most days are documentation and config.' + DEMO.affected
+    'Run this live: npm run e2e:affected on a clean tree exits green instantly, then touch libs/ui and watch two apps light up. The last row is the one that lands — most CI runs on most days are documentation and config.'
   );
 }
 
