@@ -1257,7 +1257,44 @@ const DEMO = {
   );
 }
 
-/* ── 16 the cache ────────────────────────────────────────────────────── */
+/* ── 16 CI, for real ─────────────────────────────────────────────────── */
+{
+  const s = lightSlide();
+  kicker(s, 'Section 04 · Proof', '0B7A44');
+  title(s, 'That run, on this repo', '10131A');
+
+  // sized so the stat row below it has room
+  const imgW = 9.2;
+  const imgH = imgW * (1245 / 2660);
+  const imgX = (W - imgW) / 2;
+  s.addImage({ path: 'assets/ci-parallel-run.png', x: imgX, y: 1.72, w: imgW, h: imgH });
+  s.addShape(pres.ShapeType.rect, {
+    x: imgX, y: 1.72, w: imgW, h: imgH,
+    fill: { color: 'FFFFFF', transparency: 100 }, line: { color: 'E2E6ED', width: 1 },
+  });
+
+  [
+    ['1m 24s', 'end to end, including npm ci', '0B7A44'],
+    ['41-45s', 'per app, all three at once', '0B7A44'],
+    ['32s', 'discover, before anything starts', 'B45309'],
+  ].forEach(([v, l, c], i) => {
+    const x = M + i * 4.05;
+    s.addText(v, {
+      x, y: 6.3, w: 3.75, h: 0.45, isTextBox: true, margin: 0,
+      fontFace: F.head, fontSize: 22, bold: true, color: c,
+    });
+    s.addText(l, {
+      x, y: 6.77, w: 3.75, h: 0.35, isTextBox: true, margin: 0,
+      fontFace: F.body, fontSize: 12, color: '5C6675',
+    });
+  });
+  notes(
+    s,
+    'Real run on the public repo — offer the link if anyone wants to check it. Three things to point at. The per-app matrix is generated from the graph, so those three jobs appeared without anyone editing the workflow. They finish within four seconds of each other, which is what a balanced split looks like. And discover costs 32s before any test starts — the honest price of building the matrix dynamically. Hardcode the matrix and you get that back.'
+  );
+}
+
+/* ── 17 the cache ────────────────────────────────────────────────────── */
 {
   const s = darkSlide();
   kicker(s, 'Section 05 · The cache');
@@ -1299,7 +1336,7 @@ const DEMO = {
   notes(s, 'Hit up-arrow and enter. The whole point is that it returns before you finish the sentence.' + DEMO.replay);
 }
 
-/* ── 17 rerun only failures ──────────────────────────────────────────── */
+/* ── 18 rerun only failures ──────────────────────────────────────────── */
 {
   const s = darkSlide();
   kicker(s, 'Section 05 · The payoff', C.hot);
@@ -1395,7 +1432,7 @@ const DEMO = {
   );
 }
 
-/* ── 18 content addressed ────────────────────────────────────────────── */
+/* ── 19 content addressed ────────────────────────────────────────────── */
 {
   const s = lightSlide();
   kicker(s, 'Section 05 · The bit that surprises people', '0B7A44');
@@ -1504,7 +1541,7 @@ const DEMO = {
   notes(s, 'If you want the "everything re-runs" version instead, run nx reset before this step. Best real example from this repo: a commit that touched only the slide deck restored the previous commit\'s cache and reported 33/36 hits and a 119ms run — the single-machine CI job went from 3m44s to 35s without anyone planning it. Inputs, not commits.' + DEMO.revert);
 }
 
-/* ── 19 the ladder ───────────────────────────────────────────────────── */
+/* ── 20 the ladder ───────────────────────────────────────────────────── */
 {
   const s = lightSlide();
   kicker(s, 'Section 06 · The numbers', '0B7A44');
@@ -1590,7 +1627,7 @@ const DEMO = {
   );
 }
 
-/* ── 20 affected ─────────────────────────────────────────────────────── */
+/* ── 21 affected ─────────────────────────────────────────────────────── */
 {
   const s = lightSlide();
   kicker(s, 'Section 06 · The graph earns its keep', '0B7A44');
@@ -1700,7 +1737,7 @@ const DEMO = {
   );
 }
 
-/* ── 21 real project ─────────────────────────────────────────────────── */
+/* ── 22 real project ─────────────────────────────────────────────────── */
 {
   const s = lightSlide();
   kicker(s, 'Section 06 · From a real project', '0B7A44');
@@ -1776,7 +1813,7 @@ const DEMO = {
   );
 }
 
-/* ── 22 call to action ───────────────────────────────────────────────── */
+/* ── 23 call to action ───────────────────────────────────────────────── */
 {
   const s = darkSlide();
   kicker(s, 'Your turn');
@@ -1820,7 +1857,7 @@ const DEMO = {
   );
 }
 
-/* ── 23 feedback & q&a ───────────────────────────────────────────────── */
+/* ── 24 feedback & q&a ───────────────────────────────────────────────── */
 {
   const s = lightSlide();
   kicker(s, 'Thank you', '0B7A44');
@@ -1869,7 +1906,7 @@ const DEMO = {
   );
 }
 
-/* ── 24 appendix ─────────────────────────────────────────────────────── */
+/* ── 25 appendix ─────────────────────────────────────────────────────── */
 {
   const s = darkSlide();
   s.addText('Appendix', {
@@ -1883,7 +1920,7 @@ const DEMO = {
   notes(s, 'Skip past this unless someone asks. The gotchas slide behind it is the one people photograph.');
 }
 
-/* ── 25 gotchas ──────────────────────────────────────────────────────── */
+/* ── 26 gotchas ──────────────────────────────────────────────────────── */
 {
   const s = lightSlide();
   kicker(s, 'Before you try this at work', 'B45309');
@@ -1944,7 +1981,7 @@ const DEMO = {
   notes(s, 'Good slide to leave up during questions. Items 3, 4 and 5 all bit this repo for real — worth telling as war stories rather than reading out. On item 2: on this laptop five and eight came out at the same 141s mean, but eight failed two runs in five, and the spec that failed passes on its own in 13s. On an 18-core M5 the opposite happened — 18 beat 9 by 29% and stayed green. Memory was not the constraint on either machine. The real limit here is the 8 performance cores, and a Cypress target wants about 1.5 of them, which puts the ceiling near 5. Divide performance cores by what a task costs, then measure.');
 }
 
-/* ── 26 appendix · playwright ─────────────────────────────────────────── */
+/* ── 27 appendix · playwright ─────────────────────────────────────────── */
 {
   const s = lightSlide();
   kicker(s, 'Appendix · The question that always comes', 'B45309');
@@ -2022,7 +2059,7 @@ const DEMO = {
 }
 
 
-/* ── 27 appendix · q&a bank ───────────────────────────────────────────── */
+/* ── 28 appendix · q&a bank ───────────────────────────────────────────── */
 {
   const s = lightSlide();
   kicker(s, 'Appendix · Prepared answers', 'B45309');

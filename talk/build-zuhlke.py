@@ -602,6 +602,27 @@ def build(prs):
     notes(s, "Sharding by index is what people expect — say why it is the wrong default here.\n\n"
              "DEMO\n  $ gh run list --limit 5\n  $ gh run view --web")
 
+    # 16 CI, for real ---------------------------------------------------------
+    s = add(prs, "Only title")
+    heading(s, "Section 04 · Proof", "That run, on this repo")
+    img_w = 9.2
+    img_h = img_w * (1245 / 2660)
+    img_x = (W - img_w) / 2
+    picture(s, ASSETS / "ci-parallel-run.png", img_x, 1.72, img_w, img_h)
+    rect(s, img_x, 1.72, img_w, img_h, fill=None, outline=LINE, radius=False)
+    for i, (v, l, c) in enumerate([
+        ("1m 24s", "end to end, including npm ci", GREEN_DEEP),
+        ("41-45s", "per app, all three at once", GREEN_DEEP),
+        ("32s", "discover, before anything starts", ORANGE_DEEP),
+    ]):
+        x = M + i * 4.05
+        write(textbox(s, x, 6.12, 3.75, 0.42), v, size=20, font=HEAD, color=c)
+        write(textbox(s, x, 6.54, 3.75, 0.3), l, size=11, color=BODY)
+    notes(s, "Real run on the public repo — offer the link if anyone wants to check it. The "
+             "per-app matrix is generated from the graph, so those three jobs appeared without "
+             "anyone editing the workflow, and they finish within four seconds of each other. "
+             "discover costs 32s before any test starts: the honest price of a dynamic matrix.")
+
     # 16 the cache -----------------------------------------------------------
     s = add(prs, "Only title")
     heading(s, "Section 05 · The cache", "Run it again. Nothing runs.")
