@@ -701,13 +701,16 @@ def build(prs):
               clock(m5), size=12, font=HEAD if i == 2 else TEXT,
               color=GREEN_DEEP if i == 2 else BODY)
 
-    rect(s, M, 6.0, 11.97, 0.92, fill=ORANGE_25, outline=ORANGE)
-    write(textbox(s, M + 0.28, 6.16, 11.4, 0.32),
+    rect(s, M, 5.85, 11.97, 1.15, fill=ORANGE_25, outline=ORANGE)
+    write(textbox(s, M + 0.28, 5.98, 11.4, 0.3),
           "Rung 2 is the honest one — atomizing without parallelism is slower than not atomizing "
-          "at all. On both machines.", size=12, color=INK)
-    write(textbox(s, M + 0.28, 6.5, 11.4, 0.32),
+          "at all. On both machines.", size=11, color=INK)
+    write(textbox(s, M + 0.28, 6.3, 11.4, 0.3),
           "Rung 4 is not always a rung — on 18 cores, nine local processes beat three runners.",
-          size=12, color=INK)
+          size=11, color=INK)
+    write(textbox(s, M + 0.28, 6.62, 11.4, 0.3),
+          "And the ceiling moves — the M5 at all 18 cores reached 34s, while the M1 got slower "
+          "past 5. Measure your own.", size=11, color=INK)
     notes(s, "Headline is 4m20s to 55s, but do not skip rung 2. Rung 3 is one flag and gets most "
              "of the win.\n\nDO NOT RUN LIVE\n  $ npm run e2e:benchmark   (~15 minutes)")
 
@@ -817,7 +820,7 @@ def build(prs):
     heading(s, "Before you try this at work", "Seven things that will bite you", kicker_color=ORANGE)
     items = [
         ("Per-task startup tax", "Each atomized target boots Cypress. Parallelism has to beat it."),
-        ("More parallel is not more faster", "--parallel=8 was no quicker than 5 on a 10-core laptop, and went red 2 runs in 5. Each target is a browser too."),
+        ("Parallelism has a ceiling — find yours", "10-core M1: 8 was no faster than 5 and went red 2 runs in 5. 18-core M5: 18 beat 9 by 29%."),
         ("e2e-ci is gated on Nx 23", "The wrapper needs Nx Cloud. The leaf targets do not."),
         ("The cache is not in .nx/cache", "Nx 23 puts it in ~/.nx/<hash>/cache. Most CI recipes cache the wrong path."),
         ("Parallel Cypress fights over :99", "Each process spawns its own Xvfb. Start one and export DISPLAY."),

@@ -1536,7 +1536,7 @@ const DEMO = {
     fontFace: F.body, fontSize: 11, bold: true, charSpacing: 1, color: '8A94A6',
   });
   s.addShape(pres.ShapeType.rect, {
-    x: m5X - 0.3, y: 1.72, w: 0.012, h: 4.25,
+    x: m5X - 0.3, y: 1.72, w: 0.012, h: 4.05,
     fill: { color: 'E2E6ED' }, line: { width: 0 },
   });
 
@@ -1567,7 +1567,7 @@ const DEMO = {
   });
 
   s.addShape(pres.ShapeType.roundRect, {
-    x: M, y: 6.15, w: W - 2 * M, h: 1.0, rectRadius: 0.07,
+    x: M, y: 5.95, w: W - 2 * M, h: 1.28, rectRadius: 0.07,
     fill: { color: 'FFF7E6' }, line: { color: 'F5A524', width: 1 },
   });
   s.addText(
@@ -1575,10 +1575,12 @@ const DEMO = {
       { text: 'Rung 2 is the honest one — ', options: { bold: true, color: '5B4308' } },
       { text: 'atomizing without parallelism is slower than not atomizing at all. On both machines.', options: { breakLine: true, color: '5B4308' } },
       { text: 'Rung 4 is not always a rung — ', options: { bold: true, color: '5B4308' } },
-      { text: 'on 18 cores, nine local processes beat three runners. Distribution pays once one machine runs out of cores.', options: { color: '5B4308' } },
+      { text: 'on 18 cores, nine local processes beat three runners. Distribution pays once one machine runs out of cores.', options: { breakLine: true, color: '5B4308' } },
+      { text: 'And the ceiling moves — ', options: { bold: true, color: '5B4308' } },
+      { text: 'the M5 at all 18 cores reached 34s, while this laptop got slower and flakier past 5. Measure your own.', options: { color: '5B4308' } },
     ],
     {
-      x: M + 0.3, y: 6.3, w: W - 2 * M - 0.6, h: 0.75, isTextBox: true, margin: 0,
+      x: M + 0.3, y: 6.1, w: W - 2 * M - 0.6, h: 1.0, isTextBox: true, margin: 0,
       fontFace: F.body, fontSize: 13, lineSpacingMultiple: 1.15,
     }
   );
@@ -1889,7 +1891,7 @@ const DEMO = {
 
   const items = [
     ['Per-task startup tax', 'Each atomized target boots Cypress. Parallelism has to beat it.'],
-    ['More parallel is not more faster', 'On a 10-core laptop --parallel=8 was no quicker than 5, and went red 2 runs in 5. Each target is a browser too.'],
+    ['Parallelism has a ceiling — find yours', '10-core M1: 8 was no faster than 5, and went red 2 runs in 5. 18-core M5: 18 beat 9 by 29%. Measure, do not assume.'],
     ['e2e-ci is gated on Nx 23', 'The wrapper needs Nx Cloud. The leaf targets do not.'],
     ['The cache is not in .nx/cache', 'Nx 23 puts it in ~/.nx/<hash>/cache. Every CI recipe online caches the wrong path.'],
     ['Parallel Cypress fights over :99', 'Each process spawns its own Xvfb. Start one and export DISPLAY.'],

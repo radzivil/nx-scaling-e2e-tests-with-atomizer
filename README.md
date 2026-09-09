@@ -25,6 +25,7 @@ Four ways to run the same 30 spec files, measured on two laptops:
 | 1 | Un-atomized — `nx e2e` per app, one process each | ~4m 20s | ~3m 16s |
 | 2 | Atomized but serial — `--parallel=1` | ~5m 40s ← *slower* | ~4m 00s ← *slower* |
 | 3 | Atomized, half your cores at once | **~2m 20s** (at 5) | **~48s** (at 9) |
+| 3+ | Atomized, *all* your cores at once | slower, and flaky (at 8) | **~34s** (at 18) |
 | 4 | One runner per app, 5 at a time on each | **~55s** | **~55s** |
 | — | Re-run with nothing changed † | ~0.2s | ~0.2s |
 
@@ -338,10 +339,10 @@ teams never turn them on.
 
 ## Gotchas worth mentioning
 
-- **More parallel is not more faster.** `--parallel` counts Cypress processes,
-  and each one drags a browser along, so the ceiling sits well below your core
-  count. `tools/run-e2e.mjs` therefore defaults to **half your cores** and prints
-  what it chose:
+- **Parallelism has a ceiling, and it moves.** `--parallel` counts Cypress
+  processes, and each one drags a browser along — so the ceiling is set by what
+  a task costs, not by your core count, and it differs per machine.
+  `tools/run-e2e.mjs` defaults to **half your cores** and prints what it chose:
 
   ```
   Running 30 atomized target(s) — all apps — with --parallel=5 (half of 10 cores):
@@ -358,9 +359,18 @@ teams never turn them on.
 
   Identical throughput, 40% failure rate. The spec that failed
   (`admin-e2e settings-save.cy.ts`) passes on its own in 13s, so it is
-  contention hitting Cypress's default timeouts, not a bug. Watch memory too:
-  each Cypress plus browser is 0.5-1 GB, so a big-core-count laptop can hit swap
-  before it runs out of cores. Measure your own ceiling before raising it.
+  contention hitting Cypress's default timeouts, not a bug.
+
+  **But that ceiling is not universal.** On the 18-core M5, pushing all the way
+  to `--parallel=18` took the same 30 targets to **34s**, against 48s at 9 — a
+  29% gain where the same move on the M1 Pro cost speed *and* reliability. Half
+  your cores is a safe default, not an optimal one. On a big machine it may be
+  leaving a third on the table; on a small one, going past it buys flakes.
+  Measure both directions before you settle.
+
+  Watch memory too: each Cypress plus browser is 0.5-1 GB, so a high-core
+  laptop can hit swap before it runs out of cores, and swapping looks exactly
+  like contention.
 
   Nx accepts `--parallel=50%` on the command line, but the same value in
   `nx.json` crashes it with `The "setMaxListeners" argument must be of type
